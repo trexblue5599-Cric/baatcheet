@@ -12,46 +12,51 @@
     background: #0f172a; color: #e2e8f0;
   }
   body {
-    display: flex; justify-content: center; align-items: center;
+    display: flex; justify-content: center; align-items: flex-start;
     padding: 16px; min-height: 100vh;
   }
   .card {
-    background: #1e293b; padding: 24px; border-radius: 14px;
-    width: 100%; max-width: 380px;
+    background: #1e293b; padding: 20px; border-radius: 14px;
+    width: 100%; max-width: 400px;
     box-shadow: 0 12px 32px rgba(0,0,0,.5);
+    margin: auto 0;
   }
-  h1 { font-size: 20px; margin: 0 0 20px; text-align: center; font-weight: 700; }
+  h1 { font-size: 20px; margin: 0 0 16px; text-align: center; font-weight: 700; }
   label { display: block; font-size: 13px; margin-bottom: 6px; color: #94a3b8; font-weight: 500; }
   input[type="file"] {
     width: 100%; padding: 12px; border-radius: 10px;
     border: 1px dashed #475569; background: #0f172a; color: #94a3b8;
-    font-size: 14px; margin-bottom: 16px; cursor: pointer;
+    font-size: 14px; margin-bottom: 12px; cursor: pointer;
   }
-  input[type="text"], select, button {
+  select, button {
     width: 100%; padding: 12px; border-radius: 10px;
     border: 1px solid #334155; background: #0f172a; color: #e2e8f0;
-    font-size: 16px; margin-bottom: 16px; font-family: inherit; outline: none;
+    font-size: 16px; margin-bottom: 12px; font-family: inherit; outline: none;
   }
-  input[type="text"]:focus, select:focus { border-color: #3b82f6; }
   select {
     appearance: none; -webkit-appearance: none;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='3'><polyline points='6 9 12 15 18 9'/></svg>");
     background-repeat: no-repeat; background-position: right 14px center;
     padding-right: 36px;
   }
+  select:focus { border-color: #3b82f6; }
   button {
     background: #3b82f6; border: none; font-weight: 600;
-    cursor: pointer; margin-bottom: 0; margin-top: 4px;
+    cursor: pointer; margin-bottom: 0;
   }
   button:active { background: #2563eb; }
   button:disabled { background: #334155; cursor: not-allowed; }
-  .preview {
-    text-align: center; font-size: 13px; color: #94a3b8;
-    margin: -8px 0 16px; min-height: 18px; word-break: break-all;
+  .list {
+    font-size: 12px; color: #94a3b8; margin: 0 0 12px;
+    max-height: 140px; overflow-y: auto;
+    background: #0f172a; border-radius: 8px; padding: 8px 10px;
+    display: none;
   }
-  .preview span { color: #38bdf8; font-weight: 600; }
+  .list.show { display: block; }
+  .list div { padding: 3px 0; word-break: break-all; }
+  .list div span { color: #38bdf8; }
   .status {
-    text-align: center; font-size: 13px; margin-top: 14px;
+    text-align: center; font-size: 13px; margin-top: 12px;
     min-height: 18px; color: #22c55e;
   }
 </style>
@@ -60,13 +65,10 @@
   <div class="card">
     <h1>📄 Extensioner</h1>
 
-    <label for="file">Pick a file</label>
-    <input id="file" type="file">
+    <label for="file">Pick files (multiple allowed)</label>
+    <input id="file" type="file" multiple>
 
-    <label for="name">File name (no extension)</label>
-    <input id="name" type="text" placeholder="e.g. app" autocomplete="off" autocapitalize="off" spellcheck="false">
-
-    <label for="ext">New extension</label>
+    <label for="ext">New extension for ALL</label>
     <select id="ext">
       <option value="js">.js</option>
       <option value="css">.css</option>
@@ -76,21 +78,20 @@
       <option value="md">.md</option>
     </select>
 
-    <div class="preview">Will save as: <span id="preview">—</span></div>
+    <div class="list" id="list"></div>
 
-    <button id="download" disabled>Download</button>
+    <button id="download" disabled>Download All</button>
     <div class="status" id="status"></div>
   </div>
 
 <script>
   var fileInput = document.getElementById('file');
-  var nameInput = document.getElementById('name');
   var extSelect = document.getElementById('ext');
-  var preview   = document.getElementById('preview');
+  var listEl    = document.getElementById('list');
   var statusEl  = document.getElementById('status');
   var btn       = document.getElementById('download');
 
-  var currentFile = null;
+  var currentFiles = [];
 
   function stripExt(filename) {
     var i = filename.lastIndexOf('.');
@@ -106,59 +107,88 @@
     return n;
   }
 
-  function currentName() {
-    return safeName(nameInput.value) + '.' + extSelect.value;
+  function newName(originalName) {
+    return safeName(stripExt(originalName)) + '.' + extSelect.value;
   }
 
-  function updatePreview() { preview.textContent = currentName(); }
+  function renderList() {
+    if (currentFiles.length === 0) {
+      listEl.classList.remove('show');
+      listEl.innerHTML = '';
+      return;
+    }
+    listEl.classList.add('show');
+    var html = '';
+    for (var i = 0; i < currentFiles.length; i++) {
+      html += '<div>' + currentFiles[i].name + ' → <span>' + newName(currentFiles[i].name) + '</span></div>';
+    }
+    listEl.innerHTML = html;
+  }
 
   fileInput.addEventListener('change', function() {
-    currentFile = fileInput.files[0] || null;
-    if (currentFile) {
-      nameInput.value = stripExt(currentFile.name);
-      btn.disabled = false;
-    } else {
-      btn.disabled = true;
-    }
-    updatePreview();
+    currentFiles = Array.prototype.slice.call(fileInput.files);
+    btn.disabled = currentFiles.length === 0;
+    renderList();
   });
 
-  nameInput.addEventListener('input', updatePreview);
-  extSelect.addEventListener('change', updatePreview);
-  updatePreview();
+  extSelect.addEventListener('change', renderList);
 
   function flash(msg) {
     statusEl.textContent = msg;
-    setTimeout(function(){ statusEl.textContent = ''; }, 2000);
+    setTimeout(function(){ statusEl.textContent = ''; }, 2500);
+  }
+
+  function downloadOne(file, delay) {
+    return new Promise(function(resolve) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        setTimeout(function() {
+          try {
+            var base64 = e.target.result.split(',')[1];
+            var binary = atob(base64);
+            var bytes = new Uint8Array(binary.length);
+            for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+            var blob = new Blob([bytes], { type: 'application/octet-stream' });
+            var url = URL.createObjectURL(blob);
+
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = newName(file.name);
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+
+            setTimeout(function() {
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+              resolve();
+            }, 300);
+          } catch (err) {
+            resolve();
+          }
+        }, delay);
+      };
+      reader.onerror = function() { resolve(); };
+      reader.readAsDataURL(file);
+    });
   }
 
   btn.addEventListener('click', function() {
-    if (!currentFile) return;
-    var filename = currentName();
+    if (currentFiles.length === 0) return;
+    btn.disabled = true;
+    var total = currentFiles.length;
 
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      var base64 = e.target.result.split(',')[1];
-      var binary = atob(base64);
-      var bytes = new Uint8Array(binary.length);
-      for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
-      var blob = new Blob([bytes], { type: 'application/octet-stream' });
-      var url = URL.createObjectURL(blob);
+    var chain = Promise.resolve();
+    currentFiles.forEach(function(file, i) {
+      chain = chain.then(function() {
+        return downloadOne(file, i * 400);
+      });
+    });
 
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-
-      setTimeout(function() {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        flash('✓ Saved: ' + filename);
-      }, 500);
-    };
-    reader.readAsDataURL(currentFile);
+    chain.then(function() {
+      flash('✓ Saved ' + total + ' file' + (total > 1 ? 's' : ''));
+      btn.disabled = false;
+    });
   });
 </script>
 </body>
