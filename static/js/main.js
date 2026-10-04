@@ -11,10 +11,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const ok = await Actions.checkSession();
   if (!ok) return;
 
-  // ---- 3. Load my profile (bio, avatar) ----
+  // ---- 3. Load my profile ----
   await Users.loadMe();
 
-  // ---- 4. Update my avatar in sidebar footer ----
+  // ---- 4. Update my avatar ----
   updateMyAvatar();
 
   // ---- 5. Load users ----
@@ -52,25 +52,47 @@ document.addEventListener("DOMContentLoaded", async () => {
   const logoutBtn = document.getElementById("logoutBtn");
   if (logoutBtn) logoutBtn.onclick = () => Actions.logout();
 
-  // ---- 11. My Profile button ----
+  // ---- 11. My Profile ----
   const myProfileBtn = document.getElementById("myProfileBtn");
   if (myProfileBtn) {
     myProfileBtn.onclick = () => Profile.openMyProfile();
   }
 
-  // ---- 12. Modal close ----
+  // ---- 12. Profile modal close ----
   const modalClose = document.getElementById("modalClose");
   const modalBackdrop = document.getElementById("modalBackdrop");
 
   if (modalClose) modalClose.onclick = () => Profile.close();
   if (modalBackdrop) modalBackdrop.onclick = () => Profile.close();
 
-  // ESC closes modal
+  // ---- 13. GIF button ----
+  const gifBtn = document.getElementById("gifBtn");
+  if (gifBtn) {
+    gifBtn.onclick = () => {
+      if (!State.activeUser) {
+        alert("Pehle kisi user se chat kholo");
+        return;
+      }
+      GIFS.open();
+    };
+  }
+
+  // ---- 14. GIF panel close ----
+  const gifClose = document.getElementById("gifClose");
+  const gifBackdrop = document.getElementById("gifBackdrop");
+
+  if (gifClose) gifClose.onclick = () => GIFS.close();
+  if (gifBackdrop) gifBackdrop.onclick = () => GIFS.close();
+
+  // ---- 15. ESC key — close modals ----
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") Profile.close();
+    if (e.key === "Escape") {
+      Profile.close();
+      GIFS.close();
+    }
   });
 
-  // ---- 13. Focus input on desktop ----
+  // ---- 16. Focus input on desktop ----
   if (!State.isMobile() && input) input.focus();
 
   console.log("🦖 Baatcheet ready —", State.me.username);
