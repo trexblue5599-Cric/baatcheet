@@ -84,23 +84,45 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (gifClose) gifClose.onclick = () => GIFS.close();
   if (gifBackdrop) gifBackdrop.onclick = () => GIFS.close();
 
-  // ---- 15. ESC key — close modals + chat ----
+  // ---- 15. Photo button ----
+  const photoBtn = document.getElementById("photoBtn");
+  const photoInput = document.getElementById("photoInput");
+
+  if (photoBtn) {
+    photoBtn.onclick = () => {
+      if (!State.activeUser) {
+        alert("Pehle kisi user se chat kholo");
+        return;
+      }
+      Photos.pick();
+    };
+  }
+
+  if (photoInput) {
+    photoInput.onchange = (e) => {
+      const file = e.target.files?.[0];
+      if (file) Photos.handleFile(file);
+      photoInput.value = "";
+    };
+  }
+
+  // ---- 16. ESC key ----
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       Profile.close();
       GIFS.close();
-      UI.closeMobileChat();   // ⭐ YE LINE NAYI HAI
+      UI.closeMobileChat();
     }
   });
 
-  // ---- 16. Focus input on desktop ----
+  // ---- 17. Focus input on desktop ----
   if (!State.isMobile() && input) input.focus();
 
   console.log("🦖 Baatcheet ready —", State.me.username);
 });
 
 // ================================
-// Helper — update my avatar in footer
+// Helper — update my avatar
 // ================================
 
 function updateMyAvatar() {
