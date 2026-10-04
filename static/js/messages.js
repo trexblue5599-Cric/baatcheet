@@ -18,7 +18,7 @@ const Messages = {
 
     const { data, error } = await sb
       .from("messages")
-      .select("id, sender_id, receiver_id, text, created_at")
+      .select("id, sender_id, receiver_id, text, image_url, gif_url, sticker_url, created_at")
       .or(`and(sender_id.eq.${myId},receiver_id.eq.${otherId}),and(sender_id.eq.${otherId},receiver_id.eq.${myId})`)
       .order("created_at", { ascending: true })
       .limit(200);
@@ -43,18 +43,30 @@ const Messages = {
   // ================================
   // Send message
   // ================================
-  async send(text) {
+  async send(text, extra = {}) {
     text = (text || "").trim();
-    if (!text || !State.activeUser) return;
+
+    if (!State.activeUser) return;
+
+    const hasGif   = !!extra.gif_url;
+    const hasImage = !!extra.image_url;
+    const hasSticker = !!extra.sticker_url;
+
+    // At least one thing to send
+    if (!text && !hasGif && !hasImage && !hasSticker) return;
 
     const receiverId = State.activeUser.id;
 
+    // ---- Optimistic UI ----
     const tempMsg = {
       id: "temp-" + Date.now(),
       sender_id: State.me.id,
       sender_name: State.me.username,
       receiver_id: receiverId,
       text: text,
+      image_url: extra.image_url || "",
+      gif_url: extra.gif_url || "",
+      sticker_url: extra.sticker_url || "",
       created_at: new Date().toISOString(),
       _temp: true
     };
@@ -65,13 +77,21 @@ const Messages = {
     UI.appendMessage(tempMsg);
     UI.renderUserList(document.getElementById("search")?.value || "");
 
+    // ---- Build insert payload ----
+    const payload = {
+      sender_id: State.me.id,
+      receiver_id: receiverId,
+      text: text || ""
+    };
+
+    if (hasGif)     payload.gif_url = extra.gif_url;
+    if (hasImage)   payload.image_url = extra.image_url;
+    if (hasSticker) payload.sticker_url = extra.sticker_url;
+
+    // ---- Insert to Supabase ----
     const { data, error } = await sb
       .from("messages")
-      .insert({
-        sender_id: State.me.id,
-        receiver_id: receiverId,
-        text: text
-      })
+      .insert(payload)
       .select()
       .single();
 
@@ -84,6 +104,7 @@ const Messages = {
       return;
     }
 
+    // ---- Replace temp with real ----
     const list = State.messages[receiverId];
     const idx = list.findIndex(m => m.id === tempMsg.id);
     if (idx !== -1) {
@@ -92,7 +113,7 @@ const Messages = {
   },
 
   // ================================
-  // Realtime — subscribe to new messages
+  // Realtime subscribe
   // ================================
   subscribe() {
     if (State.channel) return;
@@ -129,7 +150,7 @@ const Messages = {
 
     const existingIdx = State.messages[otherId].findIndex(x =>
       x.id === m.id ||
-      (x._temp && x.text === m.text && x.sender_id === m.sender_id)
+      (x._temp && x.sender_id === m.sender_id && x.text === m.text)
     );
 
     let senderName;
