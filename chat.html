@@ -52,7 +52,9 @@
 
     <!-- CHAT -->
     <main class="chat" id="chatWindow">
-      <header class="chat-header">
+
+      <!-- NORMAL HEADER -->
+      <header class="chat-header" id="normalHeader">
         <button class="back-btn" id="backBtn" aria-label="Back">←</button>
         <div class="avatar" id="headerAvatar"></div>
         <div class="chat-info">
@@ -60,6 +62,13 @@
           <span id="headerStatus" class="status">offline</span>
         </div>
       </header>
+
+      <!-- SELECT MODE BANNER -->
+      <div class="select-banner" id="selectBanner">
+        <button class="select-cancel" id="selectCancelBtn" aria-label="Cancel">✕</button>
+        <span class="select-count" id="selectCount">0 selected</span>
+        <button class="select-delete" id="selectDeleteBtn" disabled>Delete</button>
+      </div>
 
       <div class="messages" id="messages">
         <div class="empty-state">
@@ -74,6 +83,9 @@
         </button>
         <button type="button" class="composer-icon-btn" id="gifBtn" title="GIF">
           <span class="icon-gif">GIF</span>
+        </button>
+        <button type="button" class="composer-icon-btn" id="trashBtn" title="Select & Delete">
+          <span class="icon-trash">🗑</span>
         </button>
         <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off" maxlength="1000" />
         <button type="submit" id="sendBtn"><span>Send</span></button>
@@ -115,31 +127,6 @@
         <button class="btn-primary" id="modalSaveBtn">Save</button>
         <input type="file" id="modalFileInput" accept="image/*" hidden />
       </div>
-    </div>
-  </div>
-
-  <!-- DELETE MODAL -->
-  <div class="delete-modal" id="deleteModal">
-    <div class="delete-backdrop" id="deleteBackdrop"></div>
-    <div class="delete-card">
-      <div class="delete-title">Message Delete Karo</div>
-      <div class="delete-options">
-        <button class="delete-option" id="deleteMeBtn">
-          <span class="delete-icon">🗑</span>
-          <div class="delete-text">
-            <strong>Delete for me</strong>
-            <small>Sirf tumse hat jayega</small>
-          </div>
-        </button>
-        <button class="delete-option danger" id="deleteEveryoneBtn">
-          <span class="delete-icon">⚠️</span>
-          <div class="delete-text">
-            <strong>Delete for everyone</strong>
-            <small>Dono ke paas se gayab</small>
-          </div>
-        </button>
-      </div>
-      <button class="delete-cancel" id="deleteCancelBtn">Cancel</button>
     </div>
   </div>
 
