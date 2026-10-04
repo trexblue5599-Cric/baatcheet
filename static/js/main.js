@@ -84,11 +84,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (gifClose) gifClose.onclick = () => GIFS.close();
   if (gifBackdrop) gifBackdrop.onclick = () => GIFS.close();
 
-  // ---- 15. ESC key — close modals ----
+  // ---- 15. ESC key — close modals + chat ----
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       Profile.close();
       GIFS.close();
+      UI.closeMobileChat();   // ⭐ YE LINE NAYI HAI
     }
   });
 
