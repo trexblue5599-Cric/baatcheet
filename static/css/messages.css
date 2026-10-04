@@ -1,309 +1,210 @@
-/* ================================
-   Messages — column bubble, time inside
-   ================================ */
+// ================================
+// Delete — delete message feature
+// ================================
 
-.messages {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 20px 16px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  -webkit-overflow-scrolling: touch;
-}
+const Delete = {
 
-/* Empty state */
-.empty-state {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: var(--muted);
-  font-size: 15px;
-  gap: 20px;
-  text-align: center;
-  padding: 20px;
-}
+  _longPressTimer: null,
+  _currentMessageId: null,
+  _currentSenderId: null,
+  _currentOtherId: null,
+  _delegated: false,
 
-.empty-glow {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(0, 183, 255, 0.2), transparent 70%);
-  border: 1.5px solid rgba(0, 183, 255, 0.4);
-  box-shadow:
-    0 0 40px rgba(0, 183, 255, 0.25),
-    inset 0 0 30px rgba(0, 183, 255, 0.1);
-}
+  // ================================
+  // Attach handlers
+  // ================================
+  attachHandlers() {
+    const messagesEl = document.getElementById("messages");
+    if (!messagesEl) return;
+    if (this._delegated) return;
 
-/* ================================
-   Message bubble — inline-flex column
-   ================================ */
+    messagesEl.addEventListener("touchstart", (e) => {
+      const msgEl = e.target.closest(".message");
+      if (!msgEl || msgEl.classList.contains("system")) return;
 
-.message {
-  max-width: 78%;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 10px 14px;
-  border-radius: 18px;
-  font-size: 15px;
-  line-height: 1.4;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  animation: messagePop 0.22s ease-out;
-  box-sizing: border-box;
-  width: fit-content;
-}
+      e.preventDefault();
 
-@keyframes messagePop {
-  from {
-    transform: translateY(6px) scale(0.97);
-    opacity: 0;
+      this._startLongPress(msgEl, e);
+    }, { passive: false });
+
+    messagesEl.addEventListener("touchend", () => this._cancelLongPress());
+    messagesEl.addEventListener("touchmove", () => this._cancelLongPress());
+
+    messagesEl.addEventListener("contextmenu", (e) => {
+      const msgEl = e.target.closest(".message");
+      if (!msgEl || msgEl.classList.contains("system")) return;
+
+      e.preventDefault();
+      this._openMenu(msgEl);
+    });
+
+    this._delegated = true;
+  },
+
+  // ================================
+  // Start long press
+  // ================================
+  _startLongPress(msgEl, event) {
+    this._cancelLongPress();
+
+    if (event && event.preventDefault) {
+      event.preventDefault();
+    }
+
+    this._longPressTimer = setTimeout(() => {
+      if (navigator.vibrate) navigator.vibrate(30);
+      this._openMenu(msgEl);
+    }, 500);
+  },
+
+  // ================================
+  // Cancel long press
+  // ================================
+  _cancelLongPress() {
+    if (this._longPressTimer) {
+      clearTimeout(this._longPressTimer);
+      this._longPressTimer = null;
+    }
+  },
+
+  // ================================
+  // Open menu
+  // ================================
+  _openMenu(msgEl) {
+    const messageId = msgEl.dataset.messageId;
+    const senderId = msgEl.dataset.senderId;
+
+    if (!messageId) return;
+
+    this._currentMessageId = messageId;
+    this._currentSenderId = senderId;
+    this._currentOtherId = State.activeUser?.id;
+
+    const isMine = senderId === State.me.id;
+
+    const modal = document.getElementById("deleteModal");
+    if (!modal) return;
+
+    const deleteEveryoneBtn = document.getElementById("deleteEveryoneBtn");
+
+    if (isMine) {
+      deleteEveryoneBtn.style.display = "flex";
+    } else {
+      deleteEveryoneBtn.style.display = "none";
+    }
+
+    modal.classList.add("show");
+  },
+
+  // ================================
+  // Delete for me
+  // ================================
+  async deleteForMe() {
+    const msgId = this._currentMessageId;
+    const otherId = this._currentOtherId;
+    if (!msgId) return;
+
+    this.closeMenu();
+
+    const msg = State.messages[otherId]?.find(m => m.id === msgId);
+    if (!msg) return;
+
+    let deletedFor = msg.deleted_for || [];
+    if (typeof deletedFor === "string") {
+      try { deletedFor = JSON.parse(deletedFor); } catch { deletedFor = []; }
+    }
+    if (!Array.isArray(deletedFor)) deletedFor = [];
+
+    if (!deletedFor.includes(State.me.id)) {
+      deletedFor.push(State.me.id);
+    }
+
+    const { error } = await sb
+      .from("messages")
+      .update({ deleted_for: deletedFor })
+      .eq("id", msgId);
+
+    if (error) {
+      console.error("Delete failed:", error);
+      alert("Delete nahi hua. Try again.");
+      return;
+    }
+
+    const list = State.messages[otherId];
+    const idx = list.findIndex(m => m.id === msgId);
+    if (idx !== -1) list.splice(idx, 1);
+
+    UI.renderMessages(list);
+  },
+
+  // ================================
+  // Delete for everyone
+  // ================================
+  async deleteForEveryone() {
+    const msgId = this._currentMessageId;
+    const otherId = this._currentOtherId;
+    if (!msgId) return;
+
+    if (this._currentSenderId !== State.me.id) {
+      alert("Ye message tumhara nahi hai");
+      this.closeMenu();
+      return;
+    }
+
+    if (!confirm("Sabke liye delete karna hai? Ye undo nahi hoga.")) {
+      return;
+    }
+
+    this.closeMenu();
+
+    const msg = State.messages[otherId]?.find(m => m.id === msgId);
+    if (!msg) return;
+
+    if (msg.image_url) {
+      try {
+        const url = msg.image_url;
+        const idx = url.indexOf("/photos/");
+        if (idx !== -1) {
+          const path = url.slice(idx + "/photos/".length);
+          await sb.storage.from("photos").remove([path]);
+        }
+      } catch (e) {
+        console.warn("Storage delete failed:", e);
+      }
+    }
+
+    const { error } = await sb
+      .from("messages")
+      .update({
+        deleted_for_all: true,
+        text: "",
+        image_url: "",
+        gif_url: "",
+        sticker_url: ""
+      })
+      .eq("id", msgId);
+
+    if (error) {
+      console.error("Delete failed:", error);
+      alert("Delete nahi hua. Try again.");
+      return;
+    }
+
+    const list = State.messages[otherId];
+    const idx = list.findIndex(m => m.id === msgId);
+    if (idx !== -1) list.splice(idx, 1);
+
+    UI.renderMessages(list);
+  },
+
+  // ================================
+  // Close menu
+  // ================================
+  closeMenu() {
+    const modal = document.getElementById("deleteModal");
+    if (modal) modal.classList.remove("show");
+    this._currentMessageId = null;
+    this._currentSenderId = null;
+    this._currentOtherId = null;
   }
-  to {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-}
-
-/* My message */
-.message.me {
-  align-self: flex-end;
-  align-items: flex-end;
-  background: linear-gradient(135deg, #00b7ff 0%, #0066ff 100%);
-  color: #fff;
-  border-bottom-right-radius: 5px;
-  box-shadow: 0 4px 14px rgba(0, 183, 255, 0.3);
-  font-weight: 500;
-}
-
-/* Their message */
-.message.them {
-  align-self: flex-start;
-  align-items: flex-start;
-  background: rgba(20, 28, 48, 0.95);
-  color: var(--text);
-  border: 1px solid rgba(0, 183, 255, 0.15);
-  border-bottom-left-radius: 5px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.message.them strong {
-  color: var(--neon-2);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  display: block;
-  margin-bottom: 4px;
-}
-
-/* System */
-.message.system {
-  align-self: center;
-  background: rgba(0, 183, 255, 0.06);
-  color: var(--muted);
-  font-size: 11.5px;
-  font-style: italic;
-  padding: 5px 14px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  max-width: none;
-  text-transform: lowercase;
-  align-items: center;
-}
-
-/* Time — hamesha bottom-right */
-.message .time {
-  display: block;
-  font-size: 10px;
-  opacity: 0.7;
-  margin-top: 4px;
-  letter-spacing: 0.4px;
-  align-self: flex-end;
-}
-
-.message.me .time {
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.message.them .time {
-  color: var(--muted-2);
-}
-
-/* ================================
-   Media
-   ================================ */
-
-.msg-media {
-  display: block;
-  margin: 0 0 2px 0;
-  border-radius: 12px;
-  overflow: hidden;
-  max-width: 240px;
-  background: rgba(0, 0, 0, 0.3);
-  line-height: 0;
-  position: relative;
-}
-
-.msg-image,
-.msg-gif {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-width: 240px;
-  border-radius: 12px;
-}
-
-.msg-image { cursor: zoom-in; }
-.msg-gif { cursor: pointer; }
-
-.msg-download {
-  position: absolute;
-  bottom: 6px;
-  right: 6px;
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.7);
-  color: #fff;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  line-height: 1;
-}
-
-.msg-download:hover {
-  background: var(--neon);
-  color: #000;
-}
-
-.msg-expired {
-  padding: 12px 16px;
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px dashed var(--border);
-  border-radius: 12px;
-  color: var(--muted);
-  font-size: 13px;
-  text-align: center;
-  max-width: 180px;
-}
-
-.msg-sticker {
-  display: block;
-  width: 88px;
-  height: 88px;
-  object-fit: contain;
-}
-
-.msg-text {
-  display: block;
-  word-wrap: break-word;
-}
-
-/* ================================
-   Uploading
-   ================================ */
-
-.message.uploading {
-  background: rgba(0, 183, 255, 0.12);
-  border: 1px dashed rgba(0, 183, 255, 0.4);
-  color: var(--neon-2);
-  font-size: 13px;
-  padding: 10px 14px;
-  width: auto;
-}
-
-.uploading-inner {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.uploading-spinner {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: var(--neon);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  flex-shrink: 0;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-/* ================================
-   Typing
-   ================================ */
-
-.typing {
-  display: inline-flex;
-  gap: 5px;
-  padding: 12px 16px;
-  background: rgba(20, 28, 48, 0.95);
-  border: 1px solid rgba(0, 183, 255, 0.15);
-  border-radius: 18px;
-  border-bottom-left-radius: 5px;
-  align-self: flex-start;
-  width: fit-content;
-}
-
-.typing span {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--neon);
-  animation: typingBounce 1.2s infinite ease-in-out;
-}
-
-.typing span:nth-child(2) { animation-delay: 0.15s; }
-.typing span:nth-child(3) { animation-delay: 0.30s; }
-
-@keyframes typingBounce {
-  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-  30% { transform: translateY(-5px); opacity: 1; }
-}
-
-/* ================================
-   Mobile
-   ================================ */
-
-@media (max-width: 700px) {
-  .messages {
-    padding: 14px 12px 10px;
-    gap: 8px;
-  }
-
-  .message {
-    max-width: 82%;
-    font-size: 15px;
-    padding: 9px 13px;
-  }
-
-  .empty-glow {
-    width: 70px;
-    height: 70px;
-  }
-}
-
-@media (max-width: 480px) {
-  .msg-media,
-  .msg-image,
-  .msg-gif {
-    max-width: 200px;
-  }
-
-  .msg-sticker {
-    width: 80px;
-    height: 80px;
-  }
-}
+};
