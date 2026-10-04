@@ -4,7 +4,9 @@
 
 .messages {
   flex: 1;
+  min-height: 0;              /* ⭐ YE ZAROORI HAI scroll ke liye */
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 24px 20px 16px;
   display: flex;
   flex-direction: column;
@@ -79,14 +81,19 @@
 
 .message {
   max-width: 78%;
+  width: fit-content;           /* ⭐ Width content ke hisaab se */
+  display: flex;                /* ⭐ Flex banaya */
+  flex-direction: column;       /* ⭐ Text aur time ek ke neeche */
   padding: 12px 18px;
   border-radius: 22px;
   font-size: 15.5px;
   line-height: 1.5;
   word-wrap: break-word;
+  overflow-wrap: break-word;
   animation: messagePop 0.25s ease-out;
   position: relative;
   letter-spacing: 0.2px;
+  box-sizing: border-box;
 }
 
 @keyframes messagePop {
@@ -175,10 +182,10 @@
   margin-top: 6px;
   letter-spacing: 0.5px;
   font-weight: 500;
+  align-self: flex-end;         /* ⭐ Time hamesha right corner me */
 }
 
 .message.me .time {
-  text-align: right;
   color: rgba(255, 255, 255, 0.9);
 }
 
@@ -195,7 +202,8 @@
   margin: 4px 0;
   border-radius: 14px;
   overflow: hidden;
-  max-width: 280px;
+  max-width: 260px;
+  width: 100%;
   background: rgba(0, 0, 0, 0.3);
   line-height: 0;
 }
@@ -204,7 +212,7 @@
   display: block;
   width: 100%;
   height: auto;
-  max-width: 280px;
+  max-width: 260px;
   border-radius: 14px;
   cursor: zoom-in;
   transition: transform 0.2s ease;
@@ -253,20 +261,20 @@
 }
 
 /* ================================
-   Message media — GIF
+   GIF
    ================================ */
 
 .msg-gif {
   display: block;
   width: 100%;
   height: auto;
-  max-width: 280px;
+  max-width: 260px;
   border-radius: 14px;
   cursor: pointer;
 }
 
 /* ================================
-   Message media — Sticker
+   Sticker
    ================================ */
 
 .msg-sticker {
@@ -282,15 +290,7 @@
 .msg-text {
   margin-top: 6px;
   word-wrap: break-word;
-}
-
-/* My messages — content align */
-.message.me .msg-media {
-  margin-left: auto;
-}
-
-.message.me .msg-text {
-  text-align: right;
+  overflow-wrap: break-word;
 }
 
 /* ================================
@@ -304,12 +304,14 @@
   font-size: 13px;
   padding: 12px 18px;
   animation: pulseUpload 1.5s ease-in-out infinite;
+  width: auto;
 }
 
 .uploading-inner {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-direction: row;
 }
 
 .uploading-spinner {
@@ -406,13 +408,10 @@
 }
 
 @media (max-width: 480px) {
-  .msg-media {
-    max-width: 240px;
-  }
-
+  .msg-media,
   .msg-image,
   .msg-gif {
-    max-width: 240px;
+    max-width: 220px;
   }
 
   .msg-sticker {
@@ -438,4 +437,4 @@
   .uploading-spinner {
     animation: none !important;
   }
-}
+   }
