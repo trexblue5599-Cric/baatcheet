@@ -51,7 +51,7 @@ function resetState() {
   State.messages = {};
 
   if (State.channel) {
-    try { supabase.removeChannel(State.channel); } catch {}
+    try { sb.removeChannel(State.channel); } catch {}
     State.channel = null;
   }
 }
