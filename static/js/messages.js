@@ -4,9 +4,6 @@
 
 const Messages = {
 
-  // ================================
-  // Load conversation
-  // ================================
   async load(otherId) {
     if (State.messages[otherId]) {
       UI.renderMessages(State.messages[otherId]);
@@ -54,9 +51,6 @@ const Messages = {
     }
   },
 
-  // ================================
-  // Send message
-  // ================================
   async send(text, extra = {}) {
     text = (text || "").trim();
 
@@ -125,9 +119,6 @@ const Messages = {
     }
   },
 
-  // ================================
-  // Realtime subscribe
-  // ================================
   subscribe() {
     if (State.channel) return;
 
@@ -149,9 +140,6 @@ const Messages = {
       });
   },
 
-  // ================================
-  // Handle incoming
-  // ================================
   _onNewMessage(m) {
     const myId = State.me.id;
 
@@ -190,9 +178,6 @@ const Messages = {
     UI.renderUserList(document.getElementById("search")?.value || "");
   },
 
-  // ================================
-  // Helper
-  // ================================
   _nameOf(userId) {
     const u = State.users.find(x => x.id === userId);
     return u ? u.username : null;
