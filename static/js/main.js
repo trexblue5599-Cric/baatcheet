@@ -38,6 +38,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (composer && input) {
     composer.addEventListener("submit", (e) => {
       e.preventDefault();
+
+      // Block send if select mode is on
+      if (Delete.selecting) return;
+
       const text = input.value;
       input.value = "";
       Actions.send(text);
@@ -46,7 +50,13 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // ---- 9. Back button ----
   const backBtn = document.getElementById("backBtn");
-  if (backBtn) backBtn.onclick = () => UI.closeMobileChat();
+  if (backBtn) backBtn.onclick = () => {
+    if (Delete.selecting) {
+      Delete.cancel();
+      return;
+    }
+    UI.closeMobileChat();
+  };
 
   // ---- 10. Logout ----
   const logoutBtn = document.getElementById("logoutBtn");
@@ -73,6 +83,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         alert("Pehle kisi user se chat kholo");
         return;
       }
+      if (Delete.selecting) return;
       GIFS.open();
     };
   }
@@ -94,6 +105,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         alert("Pehle kisi user se chat kholo");
         return;
       }
+      if (Delete.selecting) return;
       Photos.pick();
     };
   }
@@ -106,42 +118,47 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
   }
 
-  // ---- 16. Delete modal wiring ----
-  const deleteMeBtn = document.getElementById("deleteMeBtn");
-  const deleteEveryoneBtn = document.getElementById("deleteEveryoneBtn");
-  const deleteCancelBtn = document.getElementById("deleteCancelBtn");
-  const deleteBackdrop = document.getElementById("deleteBackdrop");
-
-  if (deleteMeBtn) {
-    deleteMeBtn.onclick = () => Delete.deleteForMe();
+  // ---- 16. Trash button — toggle select mode ----
+  const trashBtn = document.getElementById("trashBtn");
+  if (trashBtn) {
+    trashBtn.onclick = () => {
+      if (!State.activeUser) {
+        alert("Pehle kisi user se chat kholo");
+        return;
+      }
+      Delete.toggleSelectMode();
+    };
   }
 
-  if (deleteEveryoneBtn) {
-    deleteEveryoneBtn.onclick = () => Delete.deleteForEveryone();
+  // ---- 17. Select banner buttons ----
+  const selectCancelBtn = document.getElementById("selectCancelBtn");
+  const selectDeleteBtn = document.getElementById("selectDeleteBtn");
+
+  if (selectCancelBtn) {
+    selectCancelBtn.onclick = () => Delete.cancel();
   }
 
-  if (deleteCancelBtn) {
-    deleteCancelBtn.onclick = () => Delete.closeMenu();
+  if (selectDeleteBtn) {
+    selectDeleteBtn.onclick = () => Delete.deleteSelected();
   }
 
-  if (deleteBackdrop) {
-    deleteBackdrop.onclick = () => Delete.closeMenu();
-  }
-
-  // ---- 17. Attach long-press handlers to messages ----
+  // ---- 18. Attach message click handlers ----
   Delete.attachHandlers();
 
-  // ---- 18. ESC key ----
+  // ---- 19. ESC key ----
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       Profile.close();
       GIFS.close();
-      Delete.closeMenu();
+      if (Delete.selecting) {
+        Delete.cancel();
+        return;
+      }
       UI.closeMobileChat();
     }
   });
 
-  // ---- 19. Focus input on desktop ----
+  // ---- 20. Focus input on desktop ----
   if (!State.isMobile() && input) input.focus();
 
   console.log("🦖 Baatcheet ready —", State.me.username);
