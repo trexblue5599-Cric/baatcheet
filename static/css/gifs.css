@@ -1,0 +1,471 @@
+/* ================================
+   GIF Picker Panel + Message Media
+   ================================ */
+
+/* ================================
+   Composer — GIF Button
+   ================================ */
+
+.composer-icon-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--neon);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  padding: 0 12px;
+  height: 42px;
+  border-radius: 21px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  font-family: inherit;
+}
+
+.composer-icon-btn:hover {
+  border-color: var(--neon);
+  background: rgba(0, 183, 255, 0.1);
+  box-shadow: 0 0 14px rgba(0, 183, 255, 0.3);
+}
+
+.composer-icon-btn:active {
+  transform: scale(0.95);
+}
+
+.icon-gif {
+  background: linear-gradient(135deg, var(--neon), var(--neon-2));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ================================
+   GIF Panel
+   ================================ */
+
+.gif-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.gif-panel.show {
+  display: flex;
+}
+
+.gif-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fadeIn 0.2s ease;
+}
+
+.gif-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 520px;
+  max-height: 75vh;
+  background: linear-gradient(180deg, rgba(10, 15, 26, 0.98), rgba(7, 11, 20, 1));
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 20px 20px 0 0;
+  padding: 20px 16px 12px;
+  box-shadow:
+    0 0 0 1px rgba(0, 183, 255, 0.12),
+    0 -20px 60px rgba(0, 0, 0, 0.7),
+    0 0 80px rgba(0, 183, 255, 0.1);
+  animation: gifIn 0.25s ease-out;
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes gifIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Desktop — center it */
+@media (min-width: 700px) {
+  .gif-panel {
+    align-items: center;
+  }
+
+  .gif-card {
+    border-radius: 20px;
+    max-height: 80vh;
+    animation: gifInDesktop 0.25s ease-out;
+  }
+
+  @keyframes gifInDesktop {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+}
+
+.gif-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  z-index: 2;
+}
+
+.gif-close:hover {
+  color: var(--neon);
+  border-color: var(--neon);
+  background: rgba(0, 183, 255, 0.1);
+}
+
+/* ================================
+   Search
+   ================================ */
+
+.gif-header {
+  margin-bottom: 12px;
+  padding-right: 40px;
+}
+
+#gifSearch {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 15px;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+#gifSearch::placeholder {
+  color: var(--muted);
+}
+
+#gifSearch:focus {
+  border-color: var(--neon);
+  box-shadow: 0 0 0 1px var(--neon), 0 0 20px rgba(0, 183, 255, 0.15);
+}
+
+/* ================================
+   Category Tabs
+   ================================ */
+
+.gif-tabs {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 2px 12px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  flex-shrink: 0;
+}
+
+.gif-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.gif-tab {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  line-height: 1;
+  min-width: 44px;
+  text-align: center;
+}
+
+.gif-tab:hover {
+  border-color: var(--neon);
+  background: rgba(0, 183, 255, 0.08);
+}
+
+.gif-tab.active {
+  background: linear-gradient(135deg, #00b7ff 0%, #0066ff 100%);
+  border-color: transparent;
+  box-shadow: 0 0 16px rgba(0, 183, 255, 0.4);
+}
+
+/* ================================
+   GIF Grid
+   ================================ */
+
+.gif-scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0 -8px;
+  padding: 0 8px;
+}
+
+.gif-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  padding-bottom: 12px;
+}
+
+@media (min-width: 480px) {
+  .gif-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.gif-item {
+  position: relative;
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.gif-item:hover {
+  border-color: var(--neon);
+  box-shadow: 0 0 16px rgba(0, 183, 255, 0.35);
+  transform: scale(1.02);
+}
+
+.gif-item:active {
+  transform: scale(0.97);
+}
+
+.gif-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Load more button */
+.gif-load-more {
+  grid-column: 1 / -1;
+  padding: 12px;
+  margin-top: 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--neon);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.gif-load-more:hover {
+  border-color: var(--neon);
+  background: rgba(0, 183, 255, 0.08);
+}
+
+/* States */
+.gif-loader,
+.gif-empty {
+  grid-column: 1 / -1;
+  padding: 40px 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.gif-loader::after {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-left: 8px;
+  border: 2px solid rgba(0, 183, 255, 0.3);
+  border-top-color: var(--neon);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ================================
+   Message Media (in chat)
+   ================================ */
+
+.msg-media {
+  position: relative;
+  margin: 6px 0;
+  border-radius: 12px;
+  overflow: hidden;
+  max-width: 260px;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.msg-gif,
+.msg-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 260px;
+  border-radius: 12px;
+}
+
+.msg-gif {
+  cursor: pointer;
+}
+
+.msg-image {
+  cursor: zoom-in;
+}
+
+/* Sticker (bada emoji) */
+.msg-sticker {
+  display: block;
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  margin: 4px 0;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+}
+
+/* Download button */
+.msg-download {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+}
+
+.msg-download:hover {
+  background: var(--neon);
+  color: #000;
+  transform: scale(1.1);
+}
+
+/* Expired image */
+.msg-expired {
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+  max-width: 200px;
+}
+
+/* Message text (when image/gif also present) */
+.msg-text {
+  margin-top: 6px;
+  word-wrap: break-word;
+}
+
+/* My messages — content adjustments */
+.message.me .msg-media {
+  margin-left: auto;
+}
+
+.message.me .msg-text {
+  text-align: right;
+}
+
+/* ================================
+   Mobile
+   ================================ */
+
+@media (max-width: 480px) {
+  .composer-icon-btn {
+    padding: 0 10px;
+    font-size: 10px;
+  }
+
+  .gif-card {
+    padding: 16px 12px 8px;
+    max-height: 80vh;
+  }
+
+  .gif-tab {
+    padding: 7px 12px;
+    font-size: 15px;
+    min-width: 40px;
+  }
+
+  .msg-media {
+    max-width: 220px;
+  }
+
+  .msg-gif,
+  .msg-image {
+    max-width: 220px;
+  }
+
+  .msg-sticker {
+    width: 80px;
+    height: 80px;
+  }
+}
+
+/* ================================
+   Reduced motion
+   ================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .gif-card,
+  .gif-backdrop {
+    animation: none !important;
+  }
+
+  .gif-item:hover {
+    transform: none;
+  }
+  }
