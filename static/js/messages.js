@@ -18,7 +18,7 @@ const Messages = {
 
     const { data, error } = await sb
       .from("messages")
-      .select("id, sender_id, receiver_id, text, image_url, gif_url, sticker_url, created_at")
+      .select("id, sender_id, receiver_id, text, image_url, gif_url, sticker_url, image_expired, created_at")
       .or(`and(sender_id.eq.${myId},receiver_id.eq.${otherId}),and(sender_id.eq.${otherId},receiver_id.eq.${myId})`)
       .order("created_at", { ascending: true })
       .limit(200);
@@ -48,16 +48,15 @@ const Messages = {
 
     if (!State.activeUser) return;
 
-    const hasGif   = !!extra.gif_url;
-    const hasImage = !!extra.image_url;
+    const hasGif     = !!extra.gif_url;
+    const hasImage   = !!extra.image_url;
     const hasSticker = !!extra.sticker_url;
 
-    // At least one thing to send
     if (!text && !hasGif && !hasImage && !hasSticker) return;
 
     const receiverId = State.activeUser.id;
 
-    // ---- Optimistic UI ----
+    // Optimistic UI
     const tempMsg = {
       id: "temp-" + Date.now(),
       sender_id: State.me.id,
@@ -77,7 +76,7 @@ const Messages = {
     UI.appendMessage(tempMsg);
     UI.renderUserList(document.getElementById("search")?.value || "");
 
-    // ---- Build insert payload ----
+    // Build payload
     const payload = {
       sender_id: State.me.id,
       receiver_id: receiverId,
@@ -88,7 +87,7 @@ const Messages = {
     if (hasImage)   payload.image_url = extra.image_url;
     if (hasSticker) payload.sticker_url = extra.sticker_url;
 
-    // ---- Insert to Supabase ----
+    // Insert
     const { data, error } = await sb
       .from("messages")
       .insert(payload)
@@ -104,11 +103,16 @@ const Messages = {
       return;
     }
 
-    // ---- Replace temp with real ----
+    // Replace temp
     const list = State.messages[receiverId];
     const idx = list.findIndex(m => m.id === tempMsg.id);
     if (idx !== -1) {
       list[idx] = { ...data, sender_name: State.me.username };
+    }
+
+    // ⭐ Auto-cleanup: 100 photos limit per chat
+    if (hasImage && typeof Photos !== "undefined") {
+      Photos.cleanupChat(receiverId).catch(() => {});
     }
   },
 
@@ -137,7 +141,7 @@ const Messages = {
   },
 
   // ================================
-  // Handle incoming message
+  // Handle incoming
   // ================================
   _onNewMessage(m) {
     const myId = State.me.id;
@@ -176,7 +180,7 @@ const Messages = {
   },
 
   // ================================
-  // Helper — username by id
+  // Helper
   // ================================
   _nameOf(userId) {
     const u = State.users.find(x => x.id === userId);
