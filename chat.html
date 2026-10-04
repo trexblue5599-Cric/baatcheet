@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="./static/css/mobile.css" />
   <link rel="stylesheet" href="./static/css/profile.css" />
   <link rel="stylesheet" href="./static/css/gifs.css" />
+  <link rel="stylesheet" href="./static/css/delete.css" />
 
   <!-- Eruda -->
   <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
@@ -117,6 +118,31 @@
     </div>
   </div>
 
+  <!-- DELETE MODAL -->
+  <div class="delete-modal" id="deleteModal">
+    <div class="delete-backdrop" id="deleteBackdrop"></div>
+    <div class="delete-card">
+      <div class="delete-title">Message Delete Karo</div>
+      <div class="delete-options">
+        <button class="delete-option" id="deleteMeBtn">
+          <span class="delete-icon">🗑</span>
+          <div class="delete-text">
+            <strong>Delete for me</strong>
+            <small>Sirf tumse hat jayega</small>
+          </div>
+        </button>
+        <button class="delete-option danger" id="deleteEveryoneBtn">
+          <span class="delete-icon">⚠️</span>
+          <div class="delete-text">
+            <strong>Delete for everyone</strong>
+            <small>Dono ke paas se gayab</small>
+          </div>
+        </button>
+      </div>
+      <button class="delete-cancel" id="deleteCancelBtn">Cancel</button>
+    </div>
+  </div>
+
   <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./static/js/supabase.js"></script>
@@ -126,6 +152,7 @@
   <script src="./static/js/avatar.js"></script>
   <script src="./static/js/photos.js"></script>
   <script src="./static/js/profile.js"></script>
+  <script src="./static/js/delete.js"></script>
   <script src="./static/js/ui.js"></script>
   <script src="./static/js/users.js"></script>
   <script src="./static/js/messages.js"></script>
