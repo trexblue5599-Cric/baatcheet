@@ -5,10 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#05070d" />
   <title>Baatcheet — Login</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" href="./icon-192.png" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Baatcheet" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- CSS -->
   <link rel="stylesheet" href="./static/css/base.css" />
   <link rel="stylesheet" href="./static/css/auth.css" />
-  <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
 </head>
 <body class="auth-body">
 
@@ -49,6 +58,7 @@
 
   </div>
 
+  <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./static/js/supabase.js"></script>
   <script src="./static/js/storage.js"></script>
@@ -123,6 +133,17 @@
       const session = await Auth.getSession();
       if (session) location.href = "./chat.html";
     });
+  </script>
+
+  <!-- PWA — Service Worker -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js")
+          .then(reg => console.log("✅ SW registered"))
+          .catch(err => console.warn("SW registration failed:", err));
+      });
+    }
   </script>
 
 </body>
