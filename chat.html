@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#05070d" />
+  <title>Baatcheet — Chat</title>
+  <link rel="stylesheet" href="/static/css/base.css" />
+  <link rel="stylesheet" href="/static/css/sidebar.css" />
+  <link rel="stylesheet" href="/static/css/chat.css" />
+  <link rel="stylesheet" href="/static/css/messages.css" />
+  <link rel="stylesheet" href="/static/css/composer.css" />
+  <link rel="stylesheet" href="/static/css/mobile.css" />
+</head>
+<body>
+
+  <div class="app">
+
+    <!-- ============================
+         SIDEBAR
+         ============================ -->
+    <aside class="sidebar" id="sidebar">
+
+      <header class="sidebar-header">
+        <div class="brand">
+          <img
+            src="/static/assets/logo.png"
+            alt="T-Rex Blue"
+            class="brand-logo"
+            onerror="this.style.display='none'"
+          />
+          <div class="brand-text">
+            <h1>Baatcheet</h1>
+            <span class="brand-sub">by T-Rex Blue</span>
+          </div>
+        </div>
+        <input type="text" id="search" placeholder="Search users..." autocomplete="off" />
+      </header>
+
+      <ul class="chat-list" id="chatList"></ul>
+
+      <footer class="sidebar-footer">
+        <span class="status-dot"></span>
+        <span id="meLabel">Guest</span>
+        <button id="logoutBtn" title="Logout" style="
+          margin-left:auto;
+          background:transparent;
+          border:1px solid var(--border);
+          color:var(--muted);
+          padding:4px 10px;
+          border-radius:8px;
+          font-size:11px;
+          letter-spacing:1px;
+          cursor:pointer;
+          text-transform:uppercase;
+          transition:all .2s ease;
+        ">Logout</button>
+      </footer>
+
+    </aside>
+
+    <!-- ============================
+         CHAT WINDOW
+         ============================ -->
+    <main class="chat" id="chatWindow">
+
+      <header class="chat-header">
+        <button class="back-btn" id="backBtn" aria-label="Back">←</button>
+        <div class="avatar" id="headerAvatar"></div>
+        <div class="chat-info">
+          <h2 id="headerName">Select a chat</h2>
+          <span id="headerStatus" class="status">offline</span>
+        </div>
+      </header>
+
+      <div class="messages" id="messages">
+        <div class="empty-state">
+          <div class="empty-glow"></div>
+          <p>Pick a conversation to start</p>
+        </div>
+      </div>
+
+      <form class="composer" id="composer" autocomplete="off">
+        <input
+          type="text"
+          id="messageInput"
+          placeholder="Type a message..."
+          autocomplete="off"
+          maxlength="1000"
+        />
+        <button type="submit" id="sendBtn">
+          <span>Send</span>
+        </button>
+      </form>
+
+    </main>
+
+  </div>
+
+  <!-- ============================
+       SCRIPTS — order matters!
+       1. supabase-js  → CDN library
+       2. supabase     → client init
+       3. storage      → localStorage
+       4. state        → global state
+       5. auth         → session check
+       6. ui           → render
+       7. users        → user list
+       8. messages     → realtime chat
+       9. actions      → open/send
+      10. main         → init
+       ============================ -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/static/js/supabase.js"></script>
+  <script src="/static/js/storage.js"></script>
+  <script src="/static/js/state.js"></script>
+  <script src="/static/js/auth.js"></script>
+  <script src="/static/js/ui.js"></script>
+  <script src="/static/js/users.js"></script>
+  <script src="/static/js/messages.js"></script>
+  <script src="/static/js/actions.js"></script>
+  <script src="/static/js/main.js"></script>
+
+</body>
+</html>
