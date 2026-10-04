@@ -106,23 +106,49 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
   }
 
-  // ---- 16. ESC key ----
+  // ---- 16. Delete modal wiring ----
+  const deleteMeBtn = document.getElementById("deleteMeBtn");
+  const deleteEveryoneBtn = document.getElementById("deleteEveryoneBtn");
+  const deleteCancelBtn = document.getElementById("deleteCancelBtn");
+  const deleteBackdrop = document.getElementById("deleteBackdrop");
+
+  if (deleteMeBtn) {
+    deleteMeBtn.onclick = () => Delete.deleteForMe();
+  }
+
+  if (deleteEveryoneBtn) {
+    deleteEveryoneBtn.onclick = () => Delete.deleteForEveryone();
+  }
+
+  if (deleteCancelBtn) {
+    deleteCancelBtn.onclick = () => Delete.closeMenu();
+  }
+
+  if (deleteBackdrop) {
+    deleteBackdrop.onclick = () => Delete.closeMenu();
+  }
+
+  // ---- 17. Attach long-press handlers to messages ----
+  Delete.attachHandlers();
+
+  // ---- 18. ESC key ----
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       Profile.close();
       GIFS.close();
+      Delete.closeMenu();
       UI.closeMobileChat();
     }
   });
 
-  // ---- 17. Focus input on desktop ----
+  // ---- 19. Focus input on desktop ----
   if (!State.isMobile() && input) input.focus();
 
   console.log("🦖 Baatcheet ready —", State.me.username);
 });
 
 // ================================
-// Helper — update my avatar
+// Helper
 // ================================
 
 function updateMyAvatar() {
