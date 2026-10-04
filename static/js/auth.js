@@ -31,7 +31,7 @@ const Auth = {
     // ---- Fake email (Supabase needs email, we use username) ----
     const email = `${username.toLowerCase()}@baatcheet.local`;
 
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await sb.auth.signUp({
       email,
       password,
       options: {
@@ -67,7 +67,7 @@ const Auth = {
 
     const email = `${username}@baatcheet.local`;
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await sb.auth.signInWithPassword({
       email,
       password
     });
@@ -87,7 +87,7 @@ const Auth = {
   // Logout
   // ================================
   async logout() {
-    await supabase.auth.signOut();
+    await sb.auth.signOut();
     Storage.clear();
     resetState();
   },
@@ -96,7 +96,7 @@ const Auth = {
   // Get current session
   // ================================
   async getSession() {
-    const { data } = await supabase.auth.getSession();
+    const { data } = await sb.auth.getSession();
     return data.session;
   },
 
@@ -104,7 +104,7 @@ const Auth = {
   // Get profile from DB
   // ================================
   async getMyProfile(userId) {
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from("profiles")
       .select("id, username")
       .eq("id", userId)
