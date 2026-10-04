@@ -1,3 +1,7 @@
+/* ================================
+   Base — Modern Gradient + Glass
+   ================================ */
+
 * {
   margin: 0;
   padding: 0;
@@ -6,22 +10,52 @@
 }
 
 :root {
-  --bg:         #05070d;
-  --panel:      #0a0f1a;
-  --panel-2:    #0f1725;
-  --border:     #142030;
-  --text:       #e8f4ff;
-  --muted:      #5a7a99;
+  /* Backgrounds */
+  --bg:          #060910;
+  --bg-2:        #0a0e1a;
+  --panel:       rgba(15, 20, 35, 0.85);
+  --panel-2:     rgba(20, 26, 45, 0.6);
+  --border:      rgba(80, 130, 200, 0.15);
+  --border-2:    rgba(0, 183, 255, 0.25);
 
-  --neon:       #00b7ff;
-  --neon-2:     #00e5ff;
-  --neon-glow:  rgba(0, 183, 255, 0.55);
-  --neon-soft:  rgba(0, 183, 255, 0.15);
+  /* Text */
+  --text:        #eaf2ff;
+  --muted:       #6b85a8;
+  --muted-2:     #4a5f7a;
 
-  --eye:        #ff2d55;
+  /* Neon */
+  --neon:        #00b7ff;
+  --neon-2:      #00e5ff;
+  --neon-3:      #0066ff;
+  --neon-glow:   rgba(0, 183, 255, 0.5);
+  --neon-soft:   rgba(0, 183, 255, 0.12);
 
-  --bubble-me:  linear-gradient(135deg, #00b7ff, #0066ff);
-  --bubble-them:#101a2b;
+  /* Bubbles */
+  --bubble-me:      linear-gradient(135deg, #00b7ff 0%, #0066ff 100%);
+  --bubble-them:    rgba(20, 28, 48, 0.9);
+
+  /* Accent */
+  --eye:  #ff2d55;
+
+  /* Radius */
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+  --r-full: 999px;
+
+  /* Shadows */
+  --shadow-sm:  0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md:  0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-lg:  0 20px 60px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 24px rgba(0, 183, 255, 0.35);
+
+  /* Font sizes */
+  --fs-sm: 12px;
+  --fs-md: 14px;
+  --fs-lg: 16px;
+  --fs-xl: 20px;
+  --fs-2xl: 26px;
 }
 
 html, body {
@@ -30,15 +64,18 @@ html, body {
 }
 
 body {
-  font-family: 'Segoe UI', -apple-system, Roboto, sans-serif;
+  font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   background:
-    radial-gradient(circle at 20% 0%, rgba(0, 183, 255, 0.08), transparent 50%),
-    radial-gradient(circle at 90% 100%, rgba(0, 229, 255, 0.06), transparent 50%),
+    radial-gradient(circle at 15% 5%, rgba(0, 120, 255, 0.10), transparent 40%),
+    radial-gradient(circle at 85% 95%, rgba(0, 220, 255, 0.08), transparent 45%),
     var(--bg);
   color: var(--text);
   height: 100dvh;
   overscroll-behavior: none;
   letter-spacing: 0.2px;
+  font-size: var(--fs-lg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .app {
@@ -46,21 +83,70 @@ body {
   height: 100dvh;
   max-width: 1300px;
   margin: 0 auto;
-  border-left: 1px solid var(--border);
-  border-right: 1px solid var(--border);
+  position: relative;
+}
+
+/* Animated background */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 183, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 183, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  z-index: 0;
+  animation: bgDrift 60s linear infinite;
+}
+
+@keyframes bgDrift {
+  0%   { transform: translate(0, 0); }
+  100% { transform: translate(60px, 60px); }
+}
+
+.app {
+  position: relative;
+  z-index: 1;
 }
 
 /* Scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 ::-webkit-scrollbar-thumb {
-  background: var(--neon-soft);
+  background: rgba(0, 183, 255, 0.2);
   border-radius: 3px;
 }
-::-webkit-scrollbar-thumb:hover { background: var(--neon-glow); }
 
-/* Text selection */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 183, 255, 0.4);
+}
+
+/* Selection */
 ::selection {
   background: var(--neon);
   color: #000;
+}
+
+/* Focus visible (accessibility) */
+*:focus-visible {
+  outline: 2px solid var(--neon);
+  outline-offset: 2px;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input,
+textarea {
+  font-family: inherit;
 }
