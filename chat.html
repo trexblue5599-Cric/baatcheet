@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#05070d" />
   <title>Baatcheet — Chat</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" href="./icon-192.png" />
+  <link rel="apple-touch-icon" href="./icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Baatcheet" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- CSS -->
   <link rel="stylesheet" href="./static/css/base.css" />
   <link rel="stylesheet" href="./static/css/sidebar.css" />
   <link rel="stylesheet" href="./static/css/chat.css" />
@@ -53,7 +64,6 @@
     <!-- CHAT -->
     <main class="chat" id="chatWindow">
 
-      <!-- NORMAL HEADER -->
       <header class="chat-header" id="normalHeader">
         <button class="back-btn" id="backBtn" aria-label="Back">←</button>
         <div class="avatar" id="headerAvatar"></div>
@@ -63,7 +73,6 @@
         </div>
       </header>
 
-      <!-- SELECT MODE BANNER -->
       <div class="select-banner" id="selectBanner">
         <button class="select-cancel" id="selectCancelBtn" aria-label="Cancel">✕</button>
         <span class="select-count" id="selectCount">0 selected</span>
@@ -95,7 +104,7 @@
 
   </div>
 
-  <!-- GIF PICKER PANEL -->
+  <!-- GIF PANEL -->
   <div class="gif-panel" id="gifPanel">
     <div class="gif-backdrop" id="gifBackdrop"></div>
     <div class="gif-card">
@@ -146,6 +155,38 @@
   <script src="./static/js/gifs.js"></script>
   <script src="./static/js/actions.js"></script>
   <script src="./static/js/main.js"></script>
+
+  <!-- PWA — Service Worker -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js")
+          .then(reg => {
+            console.log("✅ SW registered");
+
+            // Auto-update: naya SW mile toh activate karo
+            reg.addEventListener("updatefound", () => {
+              const newWorker = reg.installing;
+              newWorker.addEventListener("statechange", () => {
+                if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                  // Naya version ready — reload
+                  newWorker.postMessage("SKIP_WAITING");
+                }
+              });
+            });
+          })
+          .catch(err => console.warn("SW registration failed:", err));
+
+        // Reload page when new SW takes over
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener("controllerchange", () => {
+          if (refreshing) return;
+          refreshing = true;
+          window.location.reload();
+        });
+      });
+    }
+  </script>
 
 </body>
 </html>
