@@ -18,7 +18,7 @@ const Messages = {
     const myId = State.me.id;
 
     // Fetch from Supabase
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from("messages")
       .select("id, sender_id, receiver_id, text, created_at")
       .or(`and(sender_id.eq.${myId},receiver_id.eq.${otherId}),and(sender_id.eq.${otherId},receiver_id.eq.${myId})`)
@@ -70,7 +70,7 @@ const Messages = {
     UI.renderUserList(document.getElementById("search")?.value || "");
 
     // ---- Insert to Supabase ----
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from("messages")
       .insert({
         sender_id: State.me.id,
@@ -103,7 +103,7 @@ const Messages = {
   subscribe() {
     if (State.channel) return;
 
-    State.channel = supabase
+    State.channel = sb
       .channel("baatcheet-messages")
       .on(
         "postgres_changes",
@@ -127,20 +127,17 @@ const Messages = {
   _onNewMessage(m) {
     const myId = State.me.id;
 
-    // Ignore if not for me and not from me
     if (m.sender_id !== myId && m.receiver_id !== myId) return;
 
     const otherId = m.sender_id === myId ? m.receiver_id : m.sender_id;
 
     if (!State.messages[otherId]) State.messages[otherId] = [];
 
-    // ---- Check duplicates ----
     const existingIdx = State.messages[otherId].findIndex(x =>
       x.id === m.id ||
       (x._temp && x.text === m.text && x.sender_id === m.sender_id)
     );
 
-    // Sender name
     let senderName;
     if (m.sender_id === myId) {
       senderName = State.me.username;
@@ -151,19 +148,15 @@ const Messages = {
     const msg = { ...m, sender_name: senderName };
 
     if (existingIdx !== -1) {
-      // Replace temp with real
       State.messages[otherId][existingIdx] = msg;
     } else {
-      // New message
       State.messages[otherId].push(msg);
     }
 
-    // If this chat is open → re-render
     if (State.activeUser && State.activeUser.id === otherId) {
       UI.renderMessages(State.messages[otherId]);
     }
 
-    // Update sidebar preview
     UI.renderUserList(document.getElementById("search")?.value || "");
   },
 
