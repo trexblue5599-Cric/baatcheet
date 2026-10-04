@@ -1,44 +1,193 @@
 /* ================================
-   Uploading indicator
+   Messages — bigger, gradient bubbles
    ================================ */
 
-.message.uploading {
-  background: rgba(0, 183, 255, 0.15);
-  border: 1px dashed rgba(0, 183, 255, 0.4);
-  color: var(--neon-2);
-  font-size: 13px;
-  padding: 12px 18px;
-  animation: pulseUpload 1.5s ease-in-out infinite;
-}
-
-.uploading-inner {
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 20px 16px;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 12px;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  position: relative;
 }
 
-.uploading-spinner {
-  display: inline-block;
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: var(--neon);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-  flex-shrink: 0;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-@keyframes pulseUpload {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.6; }
+.messages > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* ================================
-   Photo message media
+   Empty state
+   ================================ */
+
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 15px;
+  gap: 22px;
+  text-align: center;
+  padding: 20px;
+}
+
+.empty-glow {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(0, 183, 255, 0.2),
+    transparent 70%
+  );
+  border: 1.5px solid rgba(0, 183, 255, 0.4);
+  box-shadow:
+    0 0 40px rgba(0, 183, 255, 0.25),
+    inset 0 0 30px rgba(0, 183, 255, 0.1);
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow:
+      0 0 40px rgba(0, 183, 255, 0.25),
+      inset 0 0 30px rgba(0, 183, 255, 0.1);
+  }
+  50% {
+    transform: scale(1.08);
+    box-shadow:
+      0 0 60px rgba(0, 183, 255, 0.45),
+      inset 0 0 40px rgba(0, 183, 255, 0.18);
+  }
+}
+
+.empty-state p {
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+/* ================================
+   Message bubble
+   ================================ */
+
+.message {
+  max-width: 78%;
+  padding: 12px 18px;
+  border-radius: 22px;
+  font-size: 15.5px;
+  line-height: 1.5;
+  word-wrap: break-word;
+  animation: messagePop 0.25s ease-out;
+  position: relative;
+  letter-spacing: 0.2px;
+}
+
+@keyframes messagePop {
+  from {
+    transform: translateY(8px) scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+/* My message */
+.message.me {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #00b7ff 0%, #0066ff 100%);
+  color: #fff;
+  border-bottom-right-radius: 6px;
+  box-shadow:
+    0 6px 18px rgba(0, 183, 255, 0.35),
+    0 0 30px rgba(0, 183, 255, 0.15);
+  font-weight: 500;
+}
+
+.message.me::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 22px;
+  border-bottom-right-radius: 6px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.18),
+    transparent 60%
+  );
+  pointer-events: none;
+}
+
+/* Other's message */
+.message.them {
+  align-self: flex-start;
+  background: rgba(20, 28, 48, 0.85);
+  color: var(--text);
+  border: 1px solid rgba(0, 183, 255, 0.12);
+  border-bottom-left-radius: 6px;
+  box-shadow:
+    0 4px 14px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.message.them strong {
+  color: var(--neon-2);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 5px;
+  text-shadow: 0 0 10px rgba(0, 183, 255, 0.3);
+}
+
+/* System message */
+.message.system {
+  align-self: center;
+  background: rgba(0, 183, 255, 0.05);
+  color: var(--muted);
+  font-size: 12px;
+  font-style: italic;
+  letter-spacing: 0.8px;
+  padding: 6px 16px;
+  border-radius: var(--r-full);
+  border: 1px solid var(--border);
+  max-width: none;
+  font-weight: 500;
+  text-transform: lowercase;
+}
+
+/* Time */
+.message .time {
+  display: block;
+  font-size: 10.5px;
+  opacity: 0.7;
+  margin-top: 6px;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+}
+
+.message.me .time {
+  text-align: right;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.message.them .time {
+  color: var(--muted-2);
+}
+
+/* ================================
+   Message media — IMAGE
    ================================ */
 
 .msg-media {
@@ -91,7 +240,7 @@
   transform: scale(1.1);
 }
 
-/* Expired image */
+/* Expired photo */
 .msg-expired {
   padding: 16px 20px;
   background: rgba(0, 0, 0, 0.3);
@@ -103,13 +252,190 @@
   max-width: 220px;
 }
 
-/* Mobile */
+/* ================================
+   Message media — GIF
+   ================================ */
+
+.msg-gif {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 280px;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+/* ================================
+   Message media — Sticker
+   ================================ */
+
+.msg-sticker {
+  display: block;
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  margin: 4px 0;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+}
+
+/* Text (when media also present) */
+.msg-text {
+  margin-top: 6px;
+  word-wrap: break-word;
+}
+
+/* My messages — content align */
+.message.me .msg-media {
+  margin-left: auto;
+}
+
+.message.me .msg-text {
+  text-align: right;
+}
+
+/* ================================
+   Uploading indicator
+   ================================ */
+
+.message.uploading {
+  background: rgba(0, 183, 255, 0.15);
+  border: 1px dashed rgba(0, 183, 255, 0.4);
+  color: var(--neon-2);
+  font-size: 13px;
+  padding: 12px 18px;
+  animation: pulseUpload 1.5s ease-in-out infinite;
+}
+
+.uploading-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.uploading-spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: var(--neon);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulseUpload {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.6; }
+}
+
+/* ================================
+   Typing indicator
+   ================================ */
+
+.typing {
+  display: inline-flex;
+  gap: 5px;
+  padding: 14px 18px;
+  background: rgba(20, 28, 48, 0.85);
+  border: 1px solid rgba(0, 183, 255, 0.12);
+  border-radius: 22px;
+  border-bottom-left-radius: 6px;
+  align-self: flex-start;
+  width: fit-content;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+.typing span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--neon);
+  box-shadow: 0 0 10px var(--neon-glow);
+  animation: typingBounce 1.2s infinite ease-in-out;
+}
+
+.typing span:nth-child(2) { animation-delay: 0.15s; }
+.typing span:nth-child(3) { animation-delay: 0.30s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+}
+
+/* ================================
+   Mobile
+   ================================ */
+
+@media (max-width: 700px) {
+  .messages {
+    padding: 18px 14px 12px;
+    gap: 10px;
+  }
+
+  .message {
+    max-width: 82%;
+    font-size: 15px;
+    padding: 11px 16px;
+    border-radius: 20px;
+  }
+
+  .message.me {
+    border-bottom-right-radius: 5px;
+  }
+
+  .message.them {
+    border-bottom-left-radius: 5px;
+  }
+
+  .empty-glow {
+    width: 72px;
+    height: 72px;
+  }
+}
+
 @media (max-width: 480px) {
   .msg-media {
     max-width: 240px;
   }
 
-  .msg-image {
+  .msg-image,
+  .msg-gif {
     max-width: 240px;
+  }
+
+  .msg-sticker {
+    width: 80px;
+    height: 80px;
+  }
+
+  .msg-download {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
+  }
+}
+
+/* ================================
+   Reduced motion
+   ================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .message,
+  .empty-glow,
+  .typing span,
+  .uploading-spinner {
+    animation: none !important;
   }
 }
