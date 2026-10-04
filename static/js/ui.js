@@ -5,7 +5,7 @@
 const UI = {
 
   // ================================
-  // Chat list (sidebar) — user list
+  // Chat list (sidebar) — user cards
   // ================================
   renderUserList(filter = "") {
     const el = document.getElementById("chatList");
@@ -38,10 +38,15 @@ const UI = {
       const last = msgs[msgs.length - 1];
       const preview = last
         ? (last.text.length > 30 ? last.text.slice(0, 30) + "…" : last.text)
-        : "Tap to chat";
+        : (user.bio || "Tap to chat");
+
+      // Avatar — image or initial
+      const avatarHTML = user.avatar_url
+        ? `<div class="avatar has-image"><img src="${escapeHTML(user.avatar_url)}" alt="" /></div>`
+        : `<div class="avatar">${escapeHTML(initial)}</div>`;
 
       li.innerHTML = `
-        <div class="avatar">${escapeHTML(initial)}</div>
+        ${avatarHTML}
         <div class="chat-item-info">
           <h3>${escapeHTML(user.username)}</h3>
           <p>${escapeHTML(preview)}</p>
@@ -82,13 +87,11 @@ const UI = {
     const el = document.getElementById("messages");
     if (!el) return;
 
-    // Remove empty state
     const empty = el.querySelector(".empty-state");
     if (empty) empty.remove();
 
     const div = document.createElement("div");
 
-    // ---- System message ----
     if (m.type === "system") {
       div.className = "message system";
       div.textContent = m.text;
@@ -97,7 +100,6 @@ const UI = {
       return;
     }
 
-    // ---- Normal message ----
     const mine = m.sender_id === State.me.id;
     div.className = "message " + (mine ? "me" : "them");
 
@@ -107,10 +109,22 @@ const UI = {
         <span class="time">${formatTime(m.created_at)}</span>
       `;
     } else {
+      // Dost ka avatar (chhota)
+      const other = State.activeUser || {};
+      const initial = (other.username?.[0] || "?").toUpperCase();
+      const avatarHTML = other.avatar_url
+        ? `<div class="msg-avatar has-image"><img src="${escapeHTML(other.avatar_url)}" alt="" /></div>`
+        : `<div class="msg-avatar">${escapeHTML(initial)}</div>`;
+
       div.innerHTML = `
-        <strong>${escapeHTML(m.sender_name || State.activeUser?.username || "User")}</strong>
-        ${escapeHTML(m.text)}
-        <span class="time">${formatTime(m.created_at)}</span>
+        <div class="msg-row">
+          ${avatarHTML}
+          <div class="msg-content">
+            <strong>${escapeHTML(m.sender_name || other.username || "User")}</strong>
+            ${escapeHTML(m.text)}
+            <span class="time">${formatTime(m.created_at)}</span>
+          </div>
+        </div>
       `;
     }
 
@@ -132,8 +146,18 @@ const UI = {
     const avatarEl = document.getElementById("headerAvatar");
     const statusEl = document.getElementById("headerStatus");
 
-    if (nameEl)   nameEl.textContent = user.username;
-    if (avatarEl) avatarEl.textContent = (user.username[0] || "?").toUpperCase();
+    if (nameEl) nameEl.textContent = user.username;
+
+    if (avatarEl) {
+      const initial = (user.username?.[0] || "?").toUpperCase();
+      if (user.avatar_url) {
+        avatarEl.innerHTML = `<img src="${escapeHTML(user.avatar_url)}" alt="" />`;
+        avatarEl.classList.add("has-image");
+      } else {
+        avatarEl.textContent = initial;
+        avatarEl.classList.remove("has-image");
+      }
+    }
 
     if (statusEl) {
       statusEl.textContent = "online";
@@ -163,7 +187,7 @@ const UI = {
   },
 
   // ================================
-  // Scroll to bottom
+  // Scroll
   // ================================
   scrollToBottom() {
     const el = document.getElementById("messages");
@@ -174,7 +198,7 @@ const UI = {
   },
 
   // ================================
-  // Mobile slide
+  // Mobile
   // ================================
   openMobileChat() {
     const el = document.getElementById("chatWindow");
