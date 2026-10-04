@@ -5,60 +5,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="theme-color" content="#05070d" />
   <title>Baatcheet — Login</title>
-  <link rel="stylesheet" href="/static/css/base.css" />
-  <link rel="stylesheet" href="/static/css/auth.css" />
+  <link rel="stylesheet" href="./static/css/base.css" />
+  <link rel="stylesheet" href="./static/css/auth.css" />
 </head>
 <body class="auth-body">
 
   <div class="auth-card">
 
-    <!-- Logo -->
     <div class="auth-logo">
-      <img src="/static/assets/logo.png" alt="T-Rex Blue" onerror="this.style.display='none'" />
+      <img src="./static/assets/logo.png" alt="T-Rex Blue" onerror="this.style.display='none'" />
     </div>
 
     <h1 class="auth-title">BAATCHEET</h1>
     <p class="auth-sub">by T-Rex Blue</p>
 
-    <!-- Tabs -->
     <div class="auth-tabs">
       <button class="auth-tab active" data-tab="login">Login</button>
       <button class="auth-tab" data-tab="register">Register</button>
     </div>
 
-    <!-- Form -->
     <form class="auth-form" id="authForm" autocomplete="off">
-
       <div class="auth-field">
         <label for="username">Username</label>
-        <input
-          type="text"
-          id="username"
-          placeholder="aarav"
-          required
-          minlength="3"
-          maxlength="20"
-          autocomplete="username"
-        />
+        <input type="text" id="username" placeholder="aarav" required minlength="3" maxlength="20" autocomplete="username" />
       </div>
 
       <div class="auth-field password-wrap">
         <label for="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          placeholder="••••••••"
-          required
-          minlength="4"
-          autocomplete="current-password"
-        />
+        <input type="password" id="password" placeholder="••••••••" required minlength="4" autocomplete="current-password" />
         <button type="button" class="toggle-pw" id="togglePw" aria-label="Toggle password">👁</button>
       </div>
 
       <div class="auth-message" id="authMessage"></div>
 
       <button type="submit" class="auth-submit" id="submitBtn">Login</button>
-
     </form>
 
     <p class="auth-footer">
@@ -67,71 +47,48 @@
 
   </div>
 
-  <!-- ============================
-       SCRIPTS
-       ============================ -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/static/js/supabase.js"></script>
-  <script src="/static/js/storage.js"></script>
-  <script src="/static/js/state.js"></script>
-  <script src="/static/js/auth.js"></script>
+  <script src="./static/js/supabase.js"></script>
+  <script src="./static/js/storage.js"></script>
+  <script src="./static/js/state.js"></script>
+  <script src="./static/js/auth.js"></script>
 
-  <!-- ============================
-       LOGIN PAGE LOGIC
-       ============================ -->
   <script>
     document.addEventListener("DOMContentLoaded", async () => {
-
-      // ---- Elements ----
-      const form      = document.getElementById("authForm");
-      const userEl    = document.getElementById("username");
-      const passEl    = document.getElementById("password");
-      const msgEl     = document.getElementById("authMessage");
-      const submitBtn = document.getElementById("submitBtn");
-      const tabs      = document.querySelectorAll(".auth-tab");
+      const form       = document.getElementById("authForm");
+      const userEl     = document.getElementById("username");
+      const passEl     = document.getElementById("password");
+      const msgEl      = document.getElementById("authMessage");
+      const submitBtn  = document.getElementById("submitBtn");
+      const tabs       = document.querySelectorAll(".auth-tab");
       const switchLink = document.getElementById("switchLink");
-      const togglePw  = document.getElementById("togglePw");
+      const togglePw   = document.getElementById("togglePw");
 
-      let mode = "login"; // "login" or "register"
+      let mode = "login";
 
-      // ---- Mode switch ----
       function setMode(m) {
         mode = m;
-
-        tabs.forEach(t => {
-          t.classList.toggle("active", t.dataset.tab === m);
-        });
-
+        tabs.forEach(t => t.classList.toggle("active", t.dataset.tab === m));
         submitBtn.textContent = m === "login" ? "Login" : "Register";
         switchLink.textContent = m === "login" ? "Create account" : "Login instead";
-
         msgEl.classList.remove("show", "error", "success");
         msgEl.textContent = "";
       }
 
-      tabs.forEach(t => {
-        t.addEventListener("click", () => setMode(t.dataset.tab));
-      });
+      tabs.forEach(t => t.addEventListener("click", () => setMode(t.dataset.tab)));
+      switchLink.addEventListener("click", () => setMode(mode === "login" ? "register" : "login"));
 
-      switchLink.addEventListener("click", () => {
-        setMode(mode === "login" ? "register" : "login");
-      });
-
-      // ---- Toggle password ----
       togglePw.addEventListener("click", () => {
         passEl.type = passEl.type === "password" ? "text" : "password";
       });
 
-      // ---- Show message ----
       function showMsg(text, type = "error") {
         msgEl.textContent = text;
         msgEl.className = "auth-message show " + type;
       }
 
-      // ---- Submit ----
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
-
         const username = userEl.value.trim();
         const password = passEl.value;
 
@@ -149,28 +106,20 @@
           return;
         }
 
-        // Save session info to localStorage
         Storage.saveSession({
           username: result.user.user_metadata?.username || username,
           userId: result.user.id
         });
 
-        showMsg(
-          mode === "login" ? "Login successful! 🎉" : "Account created! 🎉",
-          "success"
-        );
+        showMsg(mode === "login" ? "Login successful! 🎉" : "Account created! 🎉", "success");
 
-        // Redirect to chat
         setTimeout(() => {
-          location.href = "/chat.html";
+          location.href = "./chat.html";
         }, 700);
       });
 
-      // ---- Auto redirect if already logged in ----
       const session = await Auth.getSession();
-      if (session) {
-        location.href = "/chat.html";
-      }
+      if (session) location.href = "./chat.html";
     });
   </script>
 
