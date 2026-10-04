@@ -37,7 +37,7 @@ const UI = {
       const msgs = State.messages[user.id] || [];
       const last = msgs[msgs.length - 1];
 
-      // Preview — text, image, gif, sticker
+      // Preview
       let preview = user.bio || "Tap to chat";
       if (last) {
         if (last.gif_url) preview = "🎬 GIF";
@@ -90,7 +90,7 @@ const UI = {
   },
 
   // ================================
-  // Append single message — SUPPORTS GIF / IMAGE / STICKER
+  // Append single message
   // ================================
   appendMessage(m) {
     const el = document.getElementById("messages");
@@ -101,7 +101,6 @@ const UI = {
 
     const div = document.createElement("div");
 
-    // ---- System message ----
     if (m.type === "system") {
       div.className = "message system";
       div.textContent = m.text;
@@ -113,10 +112,9 @@ const UI = {
     const mine = m.sender_id === State.me.id;
     div.className = "message " + (mine ? "me" : "them");
 
-    // ---- Build content ----
     let contentHTML = "";
 
-    // Sticker (bada emoji)
+    // Sticker
     if (m.sticker_url) {
       contentHTML += `<img class="msg-sticker" src="${escapeHTML(m.sticker_url)}" alt="sticker" loading="lazy" />`;
     }
@@ -138,7 +136,6 @@ const UI = {
         </div>`;
     }
 
-    // Expired image
     if (m.image_url && m.image_expired) {
       contentHTML += `<div class="msg-expired">📷 Photo expired</div>`;
     }
@@ -148,10 +145,8 @@ const UI = {
       contentHTML += `<div class="msg-text">${escapeHTML(m.text)}</div>`;
     }
 
-    // Time
     contentHTML += `<span class="time">${formatTime(m.created_at)}</span>`;
 
-    // ---- Layout ----
     if (mine) {
       div.innerHTML = contentHTML;
     } else {
@@ -177,7 +172,7 @@ const UI = {
   },
 
   // ================================
-  // Chat header
+  // Chat header — FIXED
   // ================================
   setHeader(user) {
     if (!user) {
@@ -190,8 +185,10 @@ const UI = {
     const avatarEl = document.getElementById("headerAvatar");
     const statusEl = document.getElementById("headerStatus");
 
+    // Naam
     if (nameEl) nameEl.textContent = user.username;
 
+    // Avatar
     if (avatarEl) {
       const initial = (user.username?.[0] || "?").toUpperCase();
       if (user.avatar_url) {
@@ -203,8 +200,9 @@ const UI = {
       }
     }
 
+    // Status — username handle
     if (statusEl) {
-      statusEl.textContent = "online";
+      statusEl.innerHTML = `@${escapeHTML(user.username)}`;
       statusEl.className = "status online";
     }
   },
@@ -242,14 +240,16 @@ const UI = {
   },
 
   // ================================
-  // Mobile
+  // Mobile — FIXED
   // ================================
   openMobileChat() {
+    document.body.classList.add("chat-open");
     const el = document.getElementById("chatWindow");
     if (el) el.classList.add("open");
   },
 
   closeMobileChat() {
+    document.body.classList.remove("chat-open");
     const el = document.getElementById("chatWindow");
     if (el) el.classList.remove("open");
   }
