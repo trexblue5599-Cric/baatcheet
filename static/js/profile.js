@@ -11,7 +11,6 @@ const Profile = {
     const myId = State.me.id;
     if (!myId) return;
 
-    // Fetch fresh profile
     const { data, error } = await sb
       .from("profiles")
       .select("id, username, bio, avatar_url")
@@ -68,9 +67,13 @@ const Profile = {
       return { ok: false, error: "Save nahi hua" };
     }
 
-    // Update local cache
+    // Update local state
+    State.me.bio = bio;
     const u = State.users.find(x => x.id === State.me.id);
     if (u) u.bio = bio;
+
+    // Refresh sidebar user list
+    UI.renderUserList(document.getElementById("search")?.value || "");
 
     return { ok: true };
   },
@@ -83,8 +86,17 @@ const Profile = {
     if (!result.ok) return result;
 
     // Update local state
+    State.me.avatar_url = result.url;
     const u = State.users.find(x => x.id === State.me.id);
     if (u) u.avatar_url = result.url;
+
+    // Refresh sidebar user list
+    UI.renderUserList(document.getElementById("search")?.value || "");
+
+    // Refresh my footer avatar
+    if (typeof updateMyAvatar === "function") {
+      updateMyAvatar();
+    }
 
     return { ok: true, url: result.url };
   },
@@ -99,11 +111,10 @@ const Profile = {
       return;
     }
 
-    const avatarEl = document.getElementById("modalAvatar");
-    const nameEl   = document.getElementById("modalName");
-    const bioEl    = document.getElementById("modalBio");
-    const editBtn  = document.getElementById("modalEditBtn");
-    const saveBtn  = document.getElementById("modalSaveBtn");
+    const avatarEl  = document.getElementById("modalAvatar");
+    const nameEl    = document.getElementById("modalName");
+    const editBtn   = document.getElementById("modalEditBtn");
+    const saveBtn   = document.getElementById("modalSaveBtn");
     const fileInput = document.getElementById("modalFileInput");
     const uploadBtn = document.getElementById("modalUploadBtn");
 
@@ -119,7 +130,6 @@ const Profile = {
 
     nameEl.textContent = "@" + user.username;
 
-    // Bio — view or edit mode
     const bioView = document.getElementById("modalBioView");
     const bioEdit = document.getElementById("modalBioEdit");
 
@@ -139,7 +149,6 @@ const Profile = {
     bioEdit.style.display = "none";
     saveBtn.style.display = "none";
 
-    // Show modal
     modal.classList.add("show");
 
     // ---- Edit button ----
@@ -167,9 +176,6 @@ const Profile = {
         bioEdit.style.display = "none";
         editBtn.style.display = "block";
         saveBtn.style.display = "none";
-
-        // Refresh sidebar
-        UI.renderUserList(document.getElementById("search")?.value || "");
       } else {
         alert(result.error);
       }
@@ -193,13 +199,6 @@ const Profile = {
       if (result.ok) {
         avatarEl.innerHTML = `<img src="${escapeHTML(result.url)}" alt="" />`;
         avatarEl.classList.add("has-image");
-
-        // Refresh sidebar + header
-        UI.renderUserList(document.getElementById("search")?.value || "");
-
-        if (State.activeUser && State.activeUser.id === State.me.id) {
-          UI.setHeader(State.activeUser);
-        }
       } else {
         alert(result.error);
       }
