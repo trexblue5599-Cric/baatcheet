@@ -14,7 +14,7 @@
   <link rel="stylesheet" href="./static/css/profile.css" />
   <link rel="stylesheet" href="./static/css/gifs.css" />
 
-  <!-- Eruda — mobile console -->
+  <!-- Eruda -->
   <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
   <script>eruda.init();</script>
 </head>
@@ -68,11 +68,15 @@
       </div>
 
       <form class="composer" id="composer" autocomplete="off">
+        <button type="button" class="composer-icon-btn" id="photoBtn" title="Photo">
+          <span class="icon-photo">📷</span>
+        </button>
         <button type="button" class="composer-icon-btn" id="gifBtn" title="GIF">
           <span class="icon-gif">GIF</span>
         </button>
         <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off" maxlength="1000" />
         <button type="submit" id="sendBtn"><span>Send</span></button>
+        <input type="file" id="photoInput" accept="image/*" hidden />
       </form>
     </main>
 
@@ -83,13 +87,10 @@
     <div class="gif-backdrop" id="gifBackdrop"></div>
     <div class="gif-card">
       <button class="gif-close" id="gifClose" aria-label="Close">×</button>
-
       <div class="gif-header">
         <input type="text" id="gifSearch" placeholder="Search GIFs, memes..." autocomplete="off" />
       </div>
-
       <div class="gif-tabs" id="gifTabs"></div>
-
       <div class="gif-scroll">
         <div class="gif-grid" id="gifGrid"></div>
       </div>
@@ -116,13 +117,14 @@
     </div>
   </div>
 
-  <!-- SCRIPTS — order matters -->
+  <!-- SCRIPTS -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./static/js/supabase.js"></script>
   <script src="./static/js/storage.js"></script>
   <script src="./static/js/state.js"></script>
   <script src="./static/js/auth.js"></script>
   <script src="./static/js/avatar.js"></script>
+  <script src="./static/js/photos.js"></script>
   <script src="./static/js/profile.js"></script>
   <script src="./static/js/ui.js"></script>
   <script src="./static/js/users.js"></script>
