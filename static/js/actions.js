@@ -11,7 +11,7 @@ const Actions = {
     const session = await Auth.getSession();
 
     if (!session || !session.user) {
-      location.href = "/index.html";
+      location.href = "./index.html";
       return false;
     }
 
@@ -67,6 +67,6 @@ const Actions = {
     if (!confirm("Logout karna hai?")) return;
 
     await Auth.logout();
-    location.href = "/index.html";
+    location.href = "./index.html";
   }
 };
