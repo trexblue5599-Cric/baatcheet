@@ -1,10 +1,10 @@
 /* ================================
-   Messages — bigger, gradient bubbles
+   Messages — clean bubbles + scroll
    ================================ */
 
 .messages {
   flex: 1;
-  min-height: 0;              /* ⭐ YE ZAROORI HAI scroll ke liye */
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 24px 20px 16px;
@@ -12,19 +12,10 @@
   flex-direction: column;
   gap: 12px;
   -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
   position: relative;
 }
 
-.messages > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* ================================
-   Empty state
-   ================================ */
-
+/* Empty state */
 .empty-state {
   flex: 1;
   display: flex;
@@ -42,63 +33,34 @@
   width: 88px;
   height: 88px;
   border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(0, 183, 255, 0.2),
-    transparent 70%
-  );
+  background: radial-gradient(circle, rgba(0, 183, 255, 0.2), transparent 70%);
   border: 1.5px solid rgba(0, 183, 255, 0.4);
   box-shadow:
     0 0 40px rgba(0, 183, 255, 0.25),
     inset 0 0 30px rgba(0, 183, 255, 0.1);
-  animation: pulseGlow 3s ease-in-out infinite;
-}
-
-@keyframes pulseGlow {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow:
-      0 0 40px rgba(0, 183, 255, 0.25),
-      inset 0 0 30px rgba(0, 183, 255, 0.1);
-  }
-  50% {
-    transform: scale(1.08);
-    box-shadow:
-      0 0 60px rgba(0, 183, 255, 0.45),
-      inset 0 0 40px rgba(0, 183, 255, 0.18);
-  }
-}
-
-.empty-state p {
-  color: var(--muted);
-  letter-spacing: 0.5px;
-  font-weight: 500;
 }
 
 /* ================================
-   Message bubble
+   Message bubble — simple, clean
    ================================ */
 
 .message {
   max-width: 78%;
-  width: fit-content;           /* ⭐ Width content ke hisaab se */
-  display: flex;                /* ⭐ Flex banaya */
-  flex-direction: column;       /* ⭐ Text aur time ek ke neeche */
-  padding: 12px 18px;
-  border-radius: 22px;
+  width: fit-content;
+  padding: 10px 16px;
+  border-radius: 20px;
   font-size: 15.5px;
-  line-height: 1.5;
+  line-height: 1.45;
   word-wrap: break-word;
   overflow-wrap: break-word;
-  animation: messagePop 0.25s ease-out;
-  position: relative;
-  letter-spacing: 0.2px;
+  animation: messagePop 0.22s ease-out;
   box-sizing: border-box;
+  letter-spacing: 0.2px;
 }
 
 @keyframes messagePop {
   from {
-    transform: translateY(8px) scale(0.96);
+    transform: translateY(6px) scale(0.97);
     opacity: 0;
   }
   to {
@@ -107,82 +69,60 @@
   }
 }
 
-/* My message */
+/* ---- My message ---- */
 .message.me {
   align-self: flex-end;
   background: linear-gradient(135deg, #00b7ff 0%, #0066ff 100%);
   color: #fff;
-  border-bottom-right-radius: 6px;
-  box-shadow:
-    0 6px 18px rgba(0, 183, 255, 0.35),
-    0 0 30px rgba(0, 183, 255, 0.15);
+  border-bottom-right-radius: 5px;
+  box-shadow: 0 4px 14px rgba(0, 183, 255, 0.3);
   font-weight: 500;
 }
 
-.message.me::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 22px;
-  border-bottom-right-radius: 6px;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.18),
-    transparent 60%
-  );
-  pointer-events: none;
-}
-
-/* Other's message */
+/* ---- Their message ---- */
 .message.them {
   align-self: flex-start;
-  background: rgba(20, 28, 48, 0.85);
+  background: rgba(20, 28, 48, 0.95);
   color: var(--text);
-  border: 1px solid rgba(0, 183, 255, 0.12);
-  border-bottom-left-radius: 6px;
-  box-shadow:
-    0 4px 14px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 183, 255, 0.15);
+  border-bottom-left-radius: 5px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .message.them strong {
   color: var(--neon-2);
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
   display: block;
-  margin-bottom: 5px;
-  text-shadow: 0 0 10px rgba(0, 183, 255, 0.3);
+  margin-bottom: 4px;
+  text-shadow: 0 0 8px rgba(0, 183, 255, 0.3);
 }
 
-/* System message */
+/* ---- System message ---- */
 .message.system {
   align-self: center;
-  background: rgba(0, 183, 255, 0.05);
+  background: rgba(0, 183, 255, 0.06);
   color: var(--muted);
-  font-size: 12px;
+  font-size: 11.5px;
   font-style: italic;
   letter-spacing: 0.8px;
-  padding: 6px 16px;
-  border-radius: var(--r-full);
+  padding: 5px 14px;
+  border-radius: 999px;
   border: 1px solid var(--border);
   max-width: none;
-  font-weight: 500;
   text-transform: lowercase;
 }
 
-/* Time */
+/* ---- Time ---- */
 .message .time {
   display: block;
-  font-size: 10.5px;
+  font-size: 10px;
   opacity: 0.7;
-  margin-top: 6px;
-  letter-spacing: 0.5px;
-  font-weight: 500;
-  align-self: flex-end;         /* ⭐ Time hamesha right corner me */
+  margin-top: 4px;
+  letter-spacing: 0.4px;
+  text-align: right;
 }
 
 .message.me .time {
@@ -193,89 +133,63 @@
   color: var(--muted-2);
 }
 
-/* ================================
-   Message media — IMAGE
-   ================================ */
-
+/* ---- Media ---- */
 .msg-media {
   position: relative;
   margin: 4px 0;
-  border-radius: 14px;
+  border-radius: 12px;
   overflow: hidden;
   max-width: 260px;
-  width: 100%;
   background: rgba(0, 0, 0, 0.3);
   line-height: 0;
 }
 
-.msg-image {
+.msg-image,
+.msg-gif {
   display: block;
   width: 100%;
   height: auto;
   max-width: 260px;
-  border-radius: 14px;
-  cursor: zoom-in;
-  transition: transform 0.2s ease;
+  border-radius: 12px;
 }
 
-.msg-image:hover {
-  transform: scale(1.02);
-}
+.msg-image { cursor: zoom-in; }
+.msg-gif { cursor: pointer; }
 
 .msg-download {
   position: absolute;
   bottom: 8px;
   right: 8px;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: rgba(0, 0, 0, 0.7);
   color: #fff;
-  font-size: 15px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   text-decoration: none;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  transition: all 0.2s ease;
   line-height: 1;
 }
 
 .msg-download:hover {
   background: var(--neon);
   color: #000;
-  transform: scale(1.1);
 }
 
-/* Expired photo */
 .msg-expired {
-  padding: 16px 20px;
+  padding: 14px 18px;
   background: rgba(0, 0, 0, 0.3);
   border: 1px dashed var(--border);
-  border-radius: 14px;
+  border-radius: 12px;
   color: var(--muted);
   font-size: 13px;
   text-align: center;
-  max-width: 220px;
+  max-width: 200px;
 }
-
-/* ================================
-   GIF
-   ================================ */
-
-.msg-gif {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-width: 260px;
-  border-radius: 14px;
-  cursor: pointer;
-}
-
-/* ================================
-   Sticker
-   ================================ */
 
 .msg-sticker {
   display: block;
@@ -283,35 +197,27 @@
   height: 96px;
   object-fit: contain;
   margin: 4px 0;
-  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
 }
 
-/* Text (when media also present) */
 .msg-text {
-  margin-top: 6px;
+  margin-top: 4px;
   word-wrap: break-word;
-  overflow-wrap: break-word;
 }
 
-/* ================================
-   Uploading indicator
-   ================================ */
-
+/* ---- Uploading ---- */
 .message.uploading {
-  background: rgba(0, 183, 255, 0.15);
+  background: rgba(0, 183, 255, 0.12);
   border: 1px dashed rgba(0, 183, 255, 0.4);
   color: var(--neon-2);
   font-size: 13px;
-  padding: 12px 18px;
-  animation: pulseUpload 1.5s ease-in-out infinite;
+  padding: 10px 16px;
   width: auto;
 }
 
 .uploading-inner {
   display: flex;
   align-items: center;
-  gap: 10px;
-  flex-direction: row;
+  gap: 8px;
 }
 
 .uploading-spinner {
@@ -329,28 +235,17 @@
   to { transform: rotate(360deg); }
 }
 
-@keyframes pulseUpload {
-  0%, 100% { opacity: 1; }
-  50%      { opacity: 0.6; }
-}
-
-/* ================================
-   Typing indicator
-   ================================ */
-
+/* ---- Typing ---- */
 .typing {
   display: inline-flex;
   gap: 5px;
-  padding: 14px 18px;
-  background: rgba(20, 28, 48, 0.85);
-  border: 1px solid rgba(0, 183, 255, 0.12);
-  border-radius: 22px;
-  border-bottom-left-radius: 6px;
+  padding: 12px 16px;
+  background: rgba(20, 28, 48, 0.95);
+  border: 1px solid rgba(0, 183, 255, 0.15);
+  border-radius: 20px;
+  border-bottom-left-radius: 5px;
   align-self: flex-start;
   width: fit-content;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
 .typing span {
@@ -358,7 +253,7 @@
   height: 7px;
   border-radius: 50%;
   background: var(--neon);
-  box-shadow: 0 0 10px var(--neon-glow);
+  box-shadow: 0 0 8px rgba(0, 183, 255, 0.4);
   animation: typingBounce 1.2s infinite ease-in-out;
 }
 
@@ -366,44 +261,27 @@
 .typing span:nth-child(3) { animation-delay: 0.30s; }
 
 @keyframes typingBounce {
-  0%, 60%, 100% {
-    transform: translateY(0);
-    opacity: 0.4;
-  }
-  30% {
-    transform: translateY(-6px);
-    opacity: 1;
-  }
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-5px); opacity: 1; }
 }
 
-/* ================================
-   Mobile
-   ================================ */
-
+/* ---- Mobile ---- */
 @media (max-width: 700px) {
   .messages {
-    padding: 18px 14px 12px;
+    padding: 16px 12px 12px;
     gap: 10px;
   }
 
   .message {
     max-width: 82%;
     font-size: 15px;
-    padding: 11px 16px;
-    border-radius: 20px;
-  }
-
-  .message.me {
-    border-bottom-right-radius: 5px;
-  }
-
-  .message.them {
-    border-bottom-left-radius: 5px;
+    padding: 10px 14px;
+    border-radius: 18px;
   }
 
   .empty-glow {
-    width: 72px;
-    height: 72px;
+    width: 70px;
+    height: 70px;
   }
 }
 
@@ -418,23 +296,4 @@
     width: 80px;
     height: 80px;
   }
-
-  .msg-download {
-    width: 30px;
-    height: 30px;
-    font-size: 13px;
-  }
 }
-
-/* ================================
-   Reduced motion
-   ================================ */
-
-@media (prefers-reduced-motion: reduce) {
-  .message,
-  .empty-glow,
-  .typing span,
-  .uploading-spinner {
-    animation: none !important;
-  }
-   }
