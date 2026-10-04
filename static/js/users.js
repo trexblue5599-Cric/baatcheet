@@ -15,7 +15,7 @@ const Users = {
 
     const { data, error } = await sb
       .from("profiles")
-      .select("id, username")
+      .select("id, username, bio, avatar_url")
       .neq("id", State.me.id)
       .order("username", { ascending: true });
 
@@ -26,6 +26,28 @@ const Users = {
 
     State.users = data || [];
     UI.renderUserList(document.getElementById("search")?.value || "");
+  },
+
+  // ================================
+  // Load my own profile
+  // ================================
+  async loadMe() {
+    if (!State.me.id) return;
+
+    const { data, error } = await sb
+      .from("profiles")
+      .select("id, username, bio, avatar_url")
+      .eq("id", State.me.id)
+      .single();
+
+    if (error) {
+      console.warn("Failed to load my profile:", error.message);
+      return;
+    }
+
+    // Update State.me
+    State.me.bio = data.bio || "";
+    State.me.avatar_url = data.avatar_url || "";
   },
 
   // ================================
