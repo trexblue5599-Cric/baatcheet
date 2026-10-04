@@ -8,7 +8,6 @@ const Messages = {
   // Load conversation with a user
   // ================================
   async load(otherId) {
-    // Cached dikhao pehle (instant)
     if (State.messages[otherId]) {
       UI.renderMessages(State.messages[otherId]);
     } else {
@@ -17,7 +16,6 @@ const Messages = {
 
     const myId = State.me.id;
 
-    // Fetch from Supabase
     const { data, error } = await sb
       .from("messages")
       .select("id, sender_id, receiver_id, text, created_at")
@@ -30,7 +28,6 @@ const Messages = {
       return;
     }
 
-    // Add sender names
     const msgs = (data || []).map(m => ({
       ...m,
       sender_name: m.sender_id === myId ? State.me.username : this._nameOf(otherId)
@@ -52,7 +49,6 @@ const Messages = {
 
     const receiverId = State.activeUser.id;
 
-    // ---- Optimistic UI — show instantly ----
     const tempMsg = {
       id: "temp-" + Date.now(),
       sender_id: State.me.id,
@@ -69,7 +65,6 @@ const Messages = {
     UI.appendMessage(tempMsg);
     UI.renderUserList(document.getElementById("search")?.value || "");
 
-    // ---- Insert to Supabase ----
     const { data, error } = await sb
       .from("messages")
       .insert({
@@ -89,7 +84,6 @@ const Messages = {
       return;
     }
 
-    // ---- Replace temp with real ----
     const list = State.messages[receiverId];
     const idx = list.findIndex(m => m.id === tempMsg.id);
     if (idx !== -1) {
