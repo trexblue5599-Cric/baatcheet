@@ -5,7 +5,7 @@
 const UI = {
 
   // ================================
-  // Chat list (sidebar) — user cards
+  // Chat list (sidebar)
   // ================================
   renderUserList(filter = "") {
     const el = document.getElementById("chatList");
@@ -36,11 +36,20 @@ const UI = {
       const initial = (user.username[0] || "?").toUpperCase();
       const msgs = State.messages[user.id] || [];
       const last = msgs[msgs.length - 1];
-      const preview = last
-        ? (last.text.length > 30 ? last.text.slice(0, 30) + "…" : last.text)
-        : (user.bio || "Tap to chat");
 
-      // Avatar — image or initial
+      // Preview — text, image, gif, sticker
+      let preview = user.bio || "Tap to chat";
+      if (last) {
+        if (last.gif_url) preview = "🎬 GIF";
+        else if (last.image_url) preview = "📷 Photo";
+        else if (last.sticker_url) preview = "🎨 Sticker";
+        else if (last.text) {
+          preview = last.text.length > 30
+            ? last.text.slice(0, 30) + "…"
+            : last.text;
+        }
+      }
+
       const avatarHTML = user.avatar_url
         ? `<div class="avatar has-image"><img src="${escapeHTML(user.avatar_url)}" alt="" /></div>`
         : `<div class="avatar">${escapeHTML(initial)}</div>`;
@@ -59,7 +68,7 @@ const UI = {
   },
 
   // ================================
-  // Render all messages
+  // Render messages
   // ================================
   renderMessages(messages) {
     const el = document.getElementById("messages");
@@ -81,7 +90,7 @@ const UI = {
   },
 
   // ================================
-  // Append single message
+  // Append single message — SUPPORTS GIF / IMAGE / STICKER
   // ================================
   appendMessage(m) {
     const el = document.getElementById("messages");
@@ -92,6 +101,7 @@ const UI = {
 
     const div = document.createElement("div");
 
+    // ---- System message ----
     if (m.type === "system") {
       div.className = "message system";
       div.textContent = m.text;
@@ -103,13 +113,48 @@ const UI = {
     const mine = m.sender_id === State.me.id;
     div.className = "message " + (mine ? "me" : "them");
 
+    // ---- Build content ----
+    let contentHTML = "";
+
+    // Sticker (bada emoji)
+    if (m.sticker_url) {
+      contentHTML += `<img class="msg-sticker" src="${escapeHTML(m.sticker_url)}" alt="sticker" loading="lazy" />`;
+    }
+
+    // GIF
+    if (m.gif_url) {
+      contentHTML += `
+        <div class="msg-media">
+          <img class="msg-gif" src="${escapeHTML(m.gif_url)}" alt="gif" loading="lazy" />
+        </div>`;
+    }
+
+    // Image
+    if (m.image_url && !m.image_expired) {
+      contentHTML += `
+        <div class="msg-media">
+          <img class="msg-image" src="${escapeHTML(m.image_url)}" alt="photo" loading="lazy" />
+          <a class="msg-download" href="${escapeHTML(m.image_url)}" download target="_blank" rel="noopener" title="Download">⬇</a>
+        </div>`;
+    }
+
+    // Expired image
+    if (m.image_url && m.image_expired) {
+      contentHTML += `<div class="msg-expired">📷 Photo expired</div>`;
+    }
+
+    // Text
+    if (m.text && m.text.trim()) {
+      contentHTML += `<div class="msg-text">${escapeHTML(m.text)}</div>`;
+    }
+
+    // Time
+    contentHTML += `<span class="time">${formatTime(m.created_at)}</span>`;
+
+    // ---- Layout ----
     if (mine) {
-      div.innerHTML = `
-        ${escapeHTML(m.text)}
-        <span class="time">${formatTime(m.created_at)}</span>
-      `;
+      div.innerHTML = contentHTML;
     } else {
-      // Dost ka avatar (chhota)
       const other = State.activeUser || {};
       const initial = (other.username?.[0] || "?").toUpperCase();
       const avatarHTML = other.avatar_url
@@ -121,8 +166,7 @@ const UI = {
           ${avatarHTML}
           <div class="msg-content">
             <strong>${escapeHTML(m.sender_name || other.username || "User")}</strong>
-            ${escapeHTML(m.text)}
-            <span class="time">${formatTime(m.created_at)}</span>
+            ${contentHTML}
           </div>
         </div>
       `;
