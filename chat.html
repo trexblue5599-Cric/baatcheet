@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="./static/css/composer.css" />
   <link rel="stylesheet" href="./static/css/mobile.css" />
   <link rel="stylesheet" href="./static/css/profile.css" />
+  <link rel="stylesheet" href="./static/css/gifs.css" />
 
   <!-- Eruda — mobile console -->
   <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
@@ -67,6 +68,9 @@
       </div>
 
       <form class="composer" id="composer" autocomplete="off">
+        <button type="button" class="composer-icon-btn" id="gifBtn" title="GIF">
+          <span class="icon-gif">GIF</span>
+        </button>
         <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off" maxlength="1000" />
         <button type="submit" id="sendBtn"><span>Send</span></button>
       </form>
@@ -74,21 +78,35 @@
 
   </div>
 
+  <!-- GIF PICKER PANEL -->
+  <div class="gif-panel" id="gifPanel">
+    <div class="gif-backdrop" id="gifBackdrop"></div>
+    <div class="gif-card">
+      <button class="gif-close" id="gifClose" aria-label="Close">×</button>
+
+      <div class="gif-header">
+        <input type="text" id="gifSearch" placeholder="Search GIFs, memes..." autocomplete="off" />
+      </div>
+
+      <div class="gif-tabs" id="gifTabs"></div>
+
+      <div class="gif-scroll">
+        <div class="gif-grid" id="gifGrid"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- PROFILE MODAL -->
   <div class="profile-modal" id="profileModal">
     <div class="profile-backdrop" id="modalBackdrop"></div>
     <div class="profile-card">
       <button class="modal-close" id="modalClose" aria-label="Close">×</button>
-
       <div class="profile-avatar" id="modalAvatar">?</div>
-
       <h2 class="profile-name" id="modalName">@user</h2>
-
       <div class="profile-bio">
         <p class="bio-view" id="modalBioView">Koi bio nahi 😶</p>
         <textarea class="bio-edit" id="modalBioEdit" maxlength="150" placeholder="Apni bio likho..." rows="3"></textarea>
       </div>
-
       <div class="profile-actions">
         <button class="btn-secondary" id="modalEditBtn">Edit Bio</button>
         <button class="btn-secondary" id="modalUploadBtn">Change Photo</button>
@@ -109,6 +127,7 @@
   <script src="./static/js/ui.js"></script>
   <script src="./static/js/users.js"></script>
   <script src="./static/js/messages.js"></script>
+  <script src="./static/js/gifs.js"></script>
   <script src="./static/js/actions.js"></script>
   <script src="./static/js/main.js"></script>
 
