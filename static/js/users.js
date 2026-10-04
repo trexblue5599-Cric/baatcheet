@@ -13,7 +13,7 @@ const Users = {
       return;
     }
 
-    const { data, error } = await supabase
+    const { data, error } = await sb
       .from("profiles")
       .select("id, username")
       .neq("id", State.me.id)
@@ -44,7 +44,7 @@ const Users = {
   },
 
   // ================================
-  // Refresh user list (call this after new user registers)
+  // Refresh user list
   // ================================
   async refresh() {
     await this.load();
