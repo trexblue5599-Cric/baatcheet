@@ -13,7 +13,7 @@
   gap: 10px;
   -webkit-overflow-scrolling: touch;
 
-  /* ⭐ Disable text selection on messages */
+  /* Disable text selection (for select mode) */
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -48,7 +48,7 @@
 }
 
 /* ================================
-   Message bubble — inline-flex column
+   Message bubble
    ================================ */
 
 .message {
@@ -66,10 +66,8 @@
   box-sizing: border-box;
   width: fit-content;
 
-  /* ⭐ Disable text selection */
   -webkit-user-select: none;
   -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
 }
@@ -85,7 +83,6 @@
   }
 }
 
-/* My message */
 .message.me {
   align-self: flex-end;
   align-items: flex-end;
@@ -96,7 +93,6 @@
   font-weight: 500;
 }
 
-/* Their message */
 .message.them {
   align-self: flex-start;
   align-items: flex-start;
@@ -117,7 +113,6 @@
   margin-bottom: 4px;
 }
 
-/* System */
 .message.system {
   align-self: center;
   background: rgba(0, 183, 255, 0.06);
@@ -132,7 +127,6 @@
   align-items: center;
 }
 
-/* Time — bottom-right */
 .message .time {
   display: block;
   font-size: 10px;
@@ -224,6 +218,53 @@
 .msg-text {
   display: block;
   word-wrap: break-word;
+}
+
+/* ================================
+   Message links — blue underlined
+   ================================ */
+
+.msg-text .msg-link {
+  color: #00b7ff;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
+  word-break: break-all;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.msg-text .msg-link:hover {
+  color: #00e5ff;
+  text-decoration-color: #00e5ff;
+  text-shadow: 0 0 8px rgba(0, 183, 255, 0.4);
+}
+
+.msg-text .msg-link:active {
+  opacity: 0.8;
+}
+
+/* My message — white link for contrast */
+.message.me .msg-text .msg-link {
+  color: #fff;
+  text-decoration-color: rgba(255, 255, 255, 0.7);
+}
+
+.message.me .msg-text .msg-link:hover {
+  color: #fff;
+  text-decoration-color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Their message — neon blue */
+.message.them .msg-text .msg-link {
+  color: #00b7ff;
+}
+
+.message.them .msg-text .msg-link:hover {
+  color: #00e5ff;
 }
 
 /* ================================
