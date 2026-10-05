@@ -131,7 +131,7 @@ const UI = {
     }
 
     if (m.text && m.text.trim()) {
-      contentHTML += `<div class="msg-text">${escapeHTML(m.text)}</div>`;
+      contentHTML += `<div class="msg-text">${linkify(escapeHTML(m.text))}</div>`;
     }
 
     contentHTML += `<span class="time">${formatTime(m.created_at)}</span>`;
@@ -229,6 +229,10 @@ const UI = {
   }
 };
 
+// ================================
+// Helpers
+// ================================
+
 function escapeHTML(s) {
   if (s === null || s === undefined) return "";
   return String(s).replace(/[&<>"']/g, c => ({
@@ -249,3 +253,24 @@ function formatTime(ts) {
     return "";
   }
 }
+
+// ================================
+// Linkify — URL detection + clickable
+// ================================
+
+function linkify(text) {
+  if (!text) return "";
+
+  const urlRegex = /(\b(?:https?:\/\/|www\.)[^\s<]+|\b(?:[a-z0-9-]+\.)+(?:com|in|org|net|io|co|app|dev|me|tv|xyz|youtu\.be|youtube\.com|instagram\.com|facebook\.com|twitter\.com|x\.com|tiktok\.com|github\.io|github\.com)(?:\/[^\s<]*)?)/gi;
+
+  return text.replace(urlRegex, (url) => {
+    let href = url;
+    if (!href.match(/^https?:\/\//i)) {
+      href = "https://" + href;
+    }
+
+    const safeHref = href.replace(/"/g, "&quot;");
+
+    return `<a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="msg-link">${url}</a>`;
+  });
+                                                    }
