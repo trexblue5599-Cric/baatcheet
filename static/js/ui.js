@@ -4,6 +4,9 @@
 
 const UI = {
 
+  // ================================
+  // User list (sidebar)
+  // ================================
   renderUserList(filter = "") {
     const el = document.getElementById("chatList");
     if (!el) return;
@@ -63,6 +66,9 @@ const UI = {
     });
   },
 
+  // ================================
+  // Render all messages
+  // ================================
   renderMessages(messages) {
     const el = document.getElementById("messages");
     if (!el) return;
@@ -82,6 +88,9 @@ const UI = {
     this.scrollToBottom();
   },
 
+  // ================================
+  // Append single message
+  // ================================
   appendMessage(m) {
     const el = document.getElementById("messages");
     if (!el) return;
@@ -160,6 +169,9 @@ const UI = {
     this.scrollToBottom();
   },
 
+  // ================================
+  // Chat header
+  // ================================
   setHeader(user) {
     if (!user) {
       const nameEl = document.getElementById("headerName");
@@ -190,6 +202,9 @@ const UI = {
     }
   },
 
+  // ================================
+  // Typing indicator
+  // ================================
   showTyping() {
     const el = document.getElementById("messages");
     if (!el) return;
@@ -208,6 +223,9 @@ const UI = {
     if (t) t.remove();
   },
 
+  // ================================
+  // Scroll
+  // ================================
   scrollToBottom() {
     const el = document.getElementById("messages");
     if (!el) return;
@@ -216,6 +234,9 @@ const UI = {
     });
   },
 
+  // ================================
+  // Mobile slide
+  // ================================
   openMobileChat() {
     document.body.classList.add("chat-open");
     const el = document.getElementById("chatWindow");
@@ -261,11 +282,9 @@ function formatTime(ts) {
 function linkify(text) {
   if (!text) return "";
 
-  // Comprehensive URL regex — all patterns
-  const urlRegex = /(\b(?:https?:\/\/)?(?:www\.)?(?:[a-z0-9-]+\.)+(?:com|in|org|net|io|co|app|dev|me|tv|xyz|info|biz|online|site|website|store|blog|tech|live|life|world|today|news|space|fun|art|club|social|chat|link|cloud|host|pro|gg|to|cc|be|us|uk|ca|au|de|fr|jp|ru|br|mx|za|in|pk|bd|lk|np|sg|my|th|ph|id|vn|kr|tw|hk)(?:\/[^\s]*)?)/gi;
+  const urlRegex = /(\b(?:https?:\/\/)?(?:www\.)?(?:[a-z0-9-]+\.)+(?:com|in|org|net|io|co|app|dev|me|tv|xyz|info|biz|online|site|website|store|blog|tech|live|life|world|today|news|space|fun|art|club|social|chat|link|cloud|host|pro|gg|to|cc|be|us|uk|ca|au|de|fr|jp|ru|br|mx|za|pk|bd|lk|np|sg|my|th|ph|id|vn|kr|tw|hk)(?:\/[^\s]*)?)/gi;
 
   return text.replace(urlRegex, (match) => {
-    // Trim trailing punctuation that isn't part of URL
     let url = match.replace(/[.,;:!?)\]}'"]+$/, "");
 
     let href = url;
@@ -279,8 +298,3 @@ function linkify(text) {
     return `<a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="msg-link">${safeUrl}</a>`;
   });
 }
-    const safeHref = href.replace(/"/g, "&quot;");
-
-    return `<a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="msg-link">${url}</a>`;
-  });
-                                                    }
