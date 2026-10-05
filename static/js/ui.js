@@ -261,14 +261,24 @@ function formatTime(ts) {
 function linkify(text) {
   if (!text) return "";
 
-  const urlRegex = /(\b(?:https?:\/\/|www\.)[^\s<]+|\b(?:[a-z0-9-]+\.)+(?:com|in|org|net|io|co|app|dev|me|tv|xyz|youtu\.be|youtube\.com|instagram\.com|facebook\.com|twitter\.com|x\.com|tiktok\.com|github\.io|github\.com)(?:\/[^\s<]*)?)/gi;
+  // Comprehensive URL regex — all patterns
+  const urlRegex = /(\b(?:https?:\/\/)?(?:www\.)?(?:[a-z0-9-]+\.)+(?:com|in|org|net|io|co|app|dev|me|tv|xyz|info|biz|online|site|website|store|blog|tech|live|life|world|today|news|space|fun|art|club|social|chat|link|cloud|host|pro|gg|to|cc|be|us|uk|ca|au|de|fr|jp|ru|br|mx|za|in|pk|bd|lk|np|sg|my|th|ph|id|vn|kr|tw|hk)(?:\/[^\s]*)?)/gi;
 
-  return text.replace(urlRegex, (url) => {
+  return text.replace(urlRegex, (match) => {
+    // Trim trailing punctuation that isn't part of URL
+    let url = match.replace(/[.,;:!?)\]}'"]+$/, "");
+
     let href = url;
     if (!href.match(/^https?:\/\//i)) {
       href = "https://" + href;
     }
 
+    const safeHref = href.replace(/"/g, "&quot;");
+    const safeUrl = url.replace(/[<>"']/g, "");
+
+    return `<a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="msg-link">${safeUrl}</a>`;
+  });
+}
     const safeHref = href.replace(/"/g, "&quot;");
 
     return `<a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="msg-link">${url}</a>`;
