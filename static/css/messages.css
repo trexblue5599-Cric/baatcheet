@@ -13,7 +13,6 @@
   gap: 10px;
   -webkit-overflow-scrolling: touch;
 
-  /* Disable text selection (for select mode) */
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -61,7 +60,7 @@
   font-size: 15px;
   line-height: 1.4;
   word-wrap: break-word;
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
   animation: messagePop 0.22s ease-out;
   box-sizing: border-box;
   width: fit-content;
@@ -215,9 +214,17 @@
   user-drag: none;
 }
 
+/* ================================
+   Message text — word break
+   ================================ */
+
 .msg-text {
   display: block;
   word-wrap: break-word;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 100%;
+  hyphens: auto;
 }
 
 /* ================================
@@ -230,10 +237,15 @@
   text-decoration-thickness: 1.5px;
   text-underline-offset: 2px;
   word-break: break-all;
+  overflow-wrap: anywhere;
   transition: all 0.2s ease;
   cursor: pointer;
-  -webkit-user-select: text;
-  user-select: text;
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  -webkit-touch-callout: default !important;
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 2;
 }
 
 .msg-text .msg-link:hover {
@@ -243,10 +255,9 @@
 }
 
 .msg-text .msg-link:active {
-  opacity: 0.8;
+  opacity: 0.7;
 }
 
-/* My message — white link for contrast */
 .message.me .msg-text .msg-link {
   color: #fff;
   text-decoration-color: rgba(255, 255, 255, 0.7);
@@ -255,16 +266,6 @@
 .message.me .msg-text .msg-link:hover {
   color: #fff;
   text-decoration-color: #fff;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-}
-
-/* Their message — neon blue */
-.message.them .msg-text .msg-link {
-  color: #00b7ff;
-}
-
-.message.them .msg-text .msg-link:hover {
-  color: #00e5ff;
 }
 
 /* ================================
